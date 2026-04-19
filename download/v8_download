@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<!-- STOCKKEPT DOWNLOAD VERSION v8 — © 2025 North American Health Sciences LLC (NAHSCO) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stockkept — Household Supply Tracker</title>
+<style>
+/* Self-hosted fonts — relative paths for offline use */
+@font-face{font-display:swap;font-family:'Playfair Display';font-style:normal;font-weight:400;src:url('fonts/playfair-display-v40-latin-regular.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'Playfair Display';font-style:normal;font-weight:600;src:url('fonts/playfair-display-v40-latin-600.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'DM Mono';font-style:normal;font-weight:400;src:url('fonts/dm-mono-v16-latin-regular.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'DM Mono';font-style:normal;font-weight:500;src:url('fonts/dm-mono-v16-latin-500.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:300;src:url('fonts/dm-sans-v17-latin-300.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:400;src:url('fonts/dm-sans-v17-latin-regular.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:500;src:url('fonts/dm-sans-v17-latin-500.woff2') format('woff2');}
+@font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:600;src:url('fonts/dm-sans-v17-latin-600.woff2') format('woff2');}
+
+:root{
+  --bg:#0f1117;--bg2:#161820;--bg3:#1d1f2b;--bg4:#252836;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8e6de;--text2:#9995a0;--text3:#5c5968;
+  --accent:#c8a96e;--accent2:#e8c87a;
+  --green:#5acea0;--green-bg:rgba(90,206,160,0.1);
+  --amber:#f0a843;--amber-bg:rgba(240,168,67,0.1);
+  --red:#e05c5c;--red-bg:rgba(224,92,92,0.1);
+  --blue:#5b9cda;--blue-bg:rgba(91,156,218,0.1);
+  --purple:#9b79d8;--teal:#3ecfcf;
+  --radius:10px;--radius-sm:6px;
+  --sidebar-w:224px;--header-h:56px;
+  --font-sans:'DM Sans',sans-serif;--font-display:'Playfair Display',serif;--font-mono:'DM Mono',monospace;
+  --trans:0.18s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
+a{color:inherit;text-decoration:none;}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none;}
+input,select,textarea{font-family:var(--font-sans);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#header{height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:20;}
+#header .logo{font-family:var(--font-display);font-size:21px;color:var(--accent);letter-spacing:-0.5px;margin-right:6px;display:flex;align-items:center;gap:0;}
+#header .logo span{font-size:10px;font-family:var(--font-sans);color:var(--text3);display:block;letter-spacing:0.05em;text-transform:uppercase;margin-top:-4px;}
+.hdr-btn{padding:6px 13px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:500;border:1px solid var(--border2);color:var(--text2);background:var(--bg3);transition:var(--trans);white-space:nowrap;cursor:pointer;}
+.hdr-btn:hover{background:var(--bg4);color:var(--text);}
+.hdr-btn.primary{background:var(--accent);color:#1a1508;border-color:var(--accent);}
+.hdr-btn.primary:hover{background:var(--accent2);}
+.hdr-btn.danger{color:var(--red);border-color:rgba(224,92,92,0.3);}
+.hdr-btn.danger:hover{background:var(--red-bg);}
+#body{display:flex;flex:1;overflow:hidden;}
+#sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.nav-section{padding:14px 12px 5px;font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 13px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;font-weight:400;transition:var(--trans);}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:rgba(200,169,110,0.12);color:var(--accent);font-weight:500;}
+.nav-item .ico{width:18px;font-size:14px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;}
+.nav-badge.amber{background:var(--amber);color:#1a1000;}
+.nav-ext{display:flex;align-items:center;gap:8px;padding:8px 13px;margin:1px 6px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text3);font-size:12px;transition:var(--trans);}
+.nav-ext:hover{background:var(--bg3);color:var(--text2);}
+#main{flex:1;overflow-y:auto;padding:26px;background:var(--bg);}
+
+.view{display:none;}.view.active{display:block;}
+.view-title{font-family:var(--font-display);font-size:26px;color:var(--text);margin-bottom:5px;}
+.view-sub{font-size:12.5px;color:var(--text3);margin-bottom:22px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+.card-title{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:var(--trans);}
+.stat-card:hover{border-color:var(--border2);background:var(--bg3);}
+.stat-label{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;}
+.stat-val{font-size:24px;font-family:var(--font-mono);font-weight:500;color:var(--text);}
+.stat-val.accent{color:var(--accent);}
+.stat-val.green{color:var(--green);}
+.stat-val.red{color:var(--red);}
+.stat-val.amber{color:var(--amber);}
+.stat-sub{font-size:10.5px;color:var(--text3);margin-top:3px;}
+
+/* SURVIVAL MINI BANNER */
+.surv-banner{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.surv-banner-val{font-family:var(--font-mono);font-size:28px;font-weight:500;color:var(--accent);line-height:1;}
+.surv-banner-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;}
+
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{padding:9px 13px;text-align:left;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;}
+th:hover{color:var(--text2);}
+td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr.row-expired{background:rgba(224,92,92,0.06);}
+tr.row-expiring{background:rgba(240,168,67,0.06);}
+tr.row-expired td{color:var(--text2);}
+tr.row-ok:hover td{background:rgba(255,255,255,0.02);}
+
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10.5px;font-weight:500;white-space:nowrap;}
+.badge.green{background:var(--green-bg);color:var(--green);}
+.badge.amber{background:var(--amber-bg);color:var(--amber);}
+.badge.red{background:var(--red-bg);color:var(--red);}
+.badge.blue{background:var(--blue-bg);color:var(--blue);}
+.badge.gray{background:rgba(255,255,255,0.06);color:var(--text2);}
+.badge.purple{background:rgba(155,121,216,0.12);color:var(--purple);}
+.badge.teal{background:rgba(62,207,207,0.1);color:var(--teal);}
+
+.progress-wrap{background:rgba(255,255,255,0.06);border-radius:4px;height:5px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.4s ease;}
+.progress-fill.green{background:var(--green);}
+.progress-fill.amber{background:var(--amber);}
+.progress-fill.red{background:var(--red);}
+.progress-fill.accent{background:var(--accent);}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:var(--trans);}
+.btn:hover{background:var(--bg4);color:var(--text);}
+.btn.sm{padding:3px 8px;font-size:11px;}
+.btn.primary{background:rgba(200,169,110,0.15);border-color:rgba(200,169,110,0.3);color:var(--accent);}
+.btn.primary:hover{background:rgba(200,169,110,0.25);}
+.btn.danger{color:var(--red);border-color:rgba(224,92,92,0.25);}
+.btn.danger:hover{background:var(--red-bg);}
+.btn.green{color:var(--green);border-color:rgba(90,206,160,0.25);}
+.btn.green:hover{background:var(--green-bg);}
+.btn.blue{color:var(--blue);border-color:rgba(91,156,218,0.25);}
+.btn.blue:hover{background:var(--blue-bg);}
+.btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:11.5px;font-weight:500;color:var(--text3);}
+label .req{color:var(--red);margin-left:2px;}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);
+  color:var(--text);padding:7px 9px;font-size:12.5px;width:100%;transition:border-color var(--trans);
+}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:auto;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);}
+input.invalid{border-color:var(--red)!important;}
+select option{background:var(--bg3);}
+.qty-row{display:flex;gap:8px;}
+.qty-row input[type=number]{flex:1;}
+.qty-row select{width:86px;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:var(--font-display);font-size:18px;}
+.modal-close{color:var(--text3);font-size:20px;line-height:1;padding:4px 8px;border-radius:4px;cursor:pointer;}
+.modal-close:hover{color:var(--text);background:var(--bg3);}
+.modal-body{padding:18px 22px;}
+.modal-footer{padding:13px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.btn-save{background:var(--accent);color:#1a1508;border:1px solid var(--accent);font-weight:600;padding:7px 18px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;transition:var(--trans);}
+.btn-save:hover{background:var(--accent2);}
+.btn-cancel{background:var(--bg3);color:var(--text2);border:1px solid var(--border2);padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;transition:var(--trans);}
+.btn-cancel:hover{background:var(--bg4);}
+
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:9px;background:var(--bg2);}
+.alert-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+.alert-title{font-size:13px;font-weight:500;}
+.alert-actions{margin-top:7px;}
+.alert-item.red{border-left:3px solid var(--red);}
+.alert-item.amber{border-left:3px solid var(--amber);}
+.alert-item.blue{border-left:3px solid var(--blue);}
+.alert-item.green{border-left:3px solid var(--green);}
+
+.survival-widget{background:rgba(200,169,110,0.06);border:1px solid rgba(200,169,110,0.18);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;cursor:pointer;transition:var(--trans);}
+.survival-widget:hover{border-color:rgba(200,169,110,0.32);}
+.survival-days{font-family:var(--font-mono);font-size:46px;font-weight:500;color:var(--accent);line-height:1;}
+.survival-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--trans);}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-pane{display:none;}.tab-pane.active{display:block;}
+
+.filter-bar{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.filter-bar input[type=text]{flex:1;min-width:150px;}
+.filter-bar select{width:134px;}
+
+.log-item{display:flex;gap:12px;padding:9px 13px;border-bottom:1px solid var(--border);font-size:12.5px;}
+.log-time{font-family:var(--font-mono);font-size:10.5px;color:var(--text3);min-width:130px;flex-shrink:0;}
+.log-desc{color:var(--text2);}
+.log-desc strong{color:var(--text);font-weight:500;}
+
+.empty{text-align:center;padding:50px 20px;color:var(--text3);}
+.empty-ico{font-size:36px;margin-bottom:10px;}
+.empty-title{font-size:15px;color:var(--text2);margin-bottom:5px;}
+
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;}
+.top-items-list .ti{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.top-items-list .ti:last-child{border-bottom:none;}
+.ti-name{flex:1;font-size:12.5px;}
+.ti-val{font-family:var(--font-mono);font-size:11.5px;color:var(--text2);}
+.confirm-msg{font-size:13.5px;color:var(--text2);margin-bottom:14px;line-height:1.7;}
+.clickable-card{cursor:pointer;transition:var(--trans);}
+.clickable-card:hover{border-color:var(--border2);background:var(--bg3)!important;}
+.age-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10.5px;background:rgba(200,169,110,0.1);color:var(--accent);margin-left:6px;}
+.rec-disclaimer{background:rgba(91,156,218,0.08);border:1px solid rgba(91,156,218,0.2);border-radius:var(--radius-sm);padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.6;margin-top:12px;}
+
+/* INSTRUCTIONS */
+.instructions-section{margin-bottom:28px;}
+.instructions-section h3{font-size:15px;font-weight:500;color:var(--accent);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.instructions-section p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.instructions-section ul{padding-left:18px;margin-bottom:8px;}
+.instructions-section ul li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px;}
+.instructions-section .tip{background:rgba(200,169,110,0.07);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:12px;color:var(--text2);margin-top:8px;}
+
+/* START HERE */
+.sh-progress{display:flex;gap:6px;margin-bottom:28px;}
+.sh-dot{flex:1;height:4px;border-radius:2px;background:var(--bg4);transition:background 0.3s;}
+.sh-dot.done{background:var(--accent);}
+.sh-dot.active{background:var(--accent2);}
+.sh-q{font-family:var(--font-display);font-size:20px;color:var(--text);margin-bottom:8px;line-height:1.3;}
+.sh-hint{font-size:12.5px;color:var(--text3);margin-bottom:22px;line-height:1.6;}
+.sh-options{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;}
+.sh-opt{padding:10px 18px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:13px;cursor:pointer;transition:var(--trans);}
+.sh-opt:hover{border-color:rgba(200,169,110,0.4);color:var(--text);}
+.sh-opt.selected{border-color:var(--accent);background:rgba(200,169,110,0.12);color:var(--accent);font-weight:500;}
+.sh-nav{display:flex;gap:10px;margin-top:10px;justify-content:space-between;}
+.sh-result-card{background:var(--bg2);border:1px solid rgba(200,169,110,0.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.sh-result-title{font-size:13px;font-weight:500;color:var(--text);}
+.sh-result-val{font-family:var(--font-mono);font-size:12.5px;color:var(--accent);}
+.sh-suggestion{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:var(--radius);padding:13px 15px;margin-bottom:9px;}
+.sh-suggestion-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.sh-suggestion-body{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
+.sh-complete-banner{background:rgba(90,206,160,0.08);border:1px solid rgba(90,206,160,0.2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px;}
+.sh-complete-banner h2{font-family:var(--font-display);font-size:22px;color:var(--green);margin-bottom:8px;}
+.sh-complete-banner p{font-size:13px;color:var(--text2);line-height:1.7;}
+.sh-num-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.sh-num-group{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;}
+.sh-num-group label{font-size:12px;color:var(--text2);white-space:nowrap;}
+.sh-num-group input{width:56px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);padding:4px 7px;font-size:13px;text-align:center;}
+
+/* MILESTONE TOAST */
+.milestone-toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid rgba(200,169,110,0.3);border-radius:var(--radius);padding:16px 18px 14px;max-width:340px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:translateY(120px);opacity:0;transition:transform 0.4s ease,opacity 0.4s ease;}
+.milestone-toast.show{transform:translateY(0);opacity:1;}
+.milestone-toast-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px;}
+.milestone-toast-body{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;}
+.milestone-toast-dismiss{font-size:11px;font-weight:500;color:var(--text3);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:4px 10px;cursor:pointer;transition:var(--trans);}
+.milestone-toast-dismiss:hover{color:var(--text);background:var(--bg4);}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- MILESTONE TOAST -->
+<div class="milestone-toast" id="milestone-toast">
+  <div class="milestone-toast-title" id="toast-title"></div>
+  <div class="milestone-toast-body" id="toast-body"></div>
+  <button class="milestone-toast-dismiss" onclick="dismissMilestoneToast()">Dismiss</button>
+</div>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="logo">
+    <div>Stockkept<span>Household Supply Tracker · v8</span></div>
+  </div>
+  <button class="hdr-btn primary" id="hdr-starthere-btn" onclick="showView('starthere')" style="display:none;font-size:13.5px;padding:8px 18px;font-weight:600;margin-right:auto;">★ Start Here</button>
+  <span id="hdr-spacer" style="margin-right:auto;display:none;"></span>
+  <button class="hdr-btn primary" onclick="openItemModal()">+ Add Inventory</button>
+  <button class="hdr-btn" onclick="showExportDialog()">Export JSON</button>
+  <label class="hdr-btn" style="cursor:pointer;">Import JSON<input type="file" accept=".json" style="display:none" onchange="showImportDialog(event)"></label>
+  <button class="hdr-btn danger" onclick="confirmReset()">Reset All</button>
+</header>
+
+<div id="body">
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-section">Main</div>
+  <div class="nav-item active" onclick="showView('dashboard')" data-view="dashboard"><span class="ico">◈</span>Dashboard</div>
+  <div class="nav-item" onclick="showView('inventory')" data-view="inventory"><span class="ico">☰</span>Inventory<span class="nav-badge amber" id="nb-expiring" style="display:none"></span></div>
+  <div class="nav-item" onclick="showView('alerts')" data-view="alerts"><span class="ico">⚑</span>Alerts<span class="nav-badge" id="nb-alerts" style="display:none"></span></div>
+  <div class="nav-item" onclick="showView('baseline')" data-view="baseline"><span class="ico">◎</span>Baseline Goals</div>
+  <div class="nav-item" onclick="showView('log')" data-view="log"><span class="ico">≡</span>Activity Log</div>
+  <div class="nav-section">Resources</div>
+  <div class="nav-item" onclick="showView('starthere')" data-view="starthere"><span class="ico">★</span>Start Here</div>
+  <div class="nav-item" onclick="showView('instructions')" data-view="instructions"><span class="ico">?</span>How to Use</div>
+  <a class="nav-ext" href="https://docs.google.com/forms/d/e/1FAIpQLSfe8J7YdUjEGwbZ3iRKHMngnlsKh07pHypeZx0fjy8Nhn6b4w/viewform?usp=publish-editor" target="_blank"><span class="ico">✉</span>Feedback / Bug Report</a>
+  <a class="nav-ext" onclick="showView('legal')" data-view="legal" style="cursor:pointer;"><span class="ico">§</span>Legal Notices</a>
+  <div style="margin-top:auto;padding:14px 10px;border-top:1px solid var(--border);">
+    <button class="hdr-btn" style="width:100%;display:flex;justify-content:center;font-size:12px;margin-bottom:7px;" onclick="window.open('https://ko-fi.com/stockkept','_blank')">🫘 Buy Me a Can of Beans</button>
+    <button class="hdr-btn" style="width:100%;display:flex;justify-content:center;font-size:12px;margin-bottom:7px;" onclick="showExportDialog()">Export JSON</button>
+    <label class="hdr-btn" style="width:100%;display:flex;justify-content:center;cursor:pointer;font-size:12px;">Import JSON<input type="file" accept=".json" style="display:none" onchange="showImportDialog(event)"></label>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+  <div class="view-title">Dashboard</div>
+  <div class="view-sub" id="dash-date"></div>
+  <div class="survival-widget" title="Click to manage Baseline Goals" onclick="showView('baseline')">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="survival-label">Estimated Survival — click to set baseline goals</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px;">
+          <div class="survival-days" id="surv-days">—</div>
+          <div class="survival-label" style="margin-top:4px;">days</div>
+        </div>
+      </div>
+      <div onclick="event.stopPropagation()">
+        <div class="survival-label" style="margin-bottom:6px;">Configure</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="font-size:11px;color:var(--text2);">People</label>
+            <input type="number" id="surv-people" min="1" value="1" style="width:60px;" oninput="updateSurvival()">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="font-size:11px;color:var(--text2);">Cal/person/day</label>
+            <select id="surv-cals" onchange="updateSurvival()" style="width:170px;font-size:12px;padding:5px 7px;">
+              <option value="1600">1,600</option>
+              <option value="1700">1,700</option>
+              <option value="1800">1,800</option>
+              <option value="1900">1,900</option>
+              <option value="2000" selected>2,000 (recommended)</option>
+              <option value="2100">2,100</option>
+              <option value="2200">2,200</option>
+              <option value="2300">2,300</option>
+              <option value="2400">2,400</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-3" id="dash-stats"></div>
+  <div class="card clickable-card" style="margin-bottom:18px;" onclick="showView('baseline')">
+    <div class="card-title">Baseline Coverage — click to manage goals</div>
+    <div id="dash-baseline"></div>
+  </div>
+  <div class="card clickable-card" style="margin-bottom:18px;" onclick="showView('alerts')">
+    <div class="card-title">Live Alerts — click to view all</div>
+    <div id="dash-alerts"></div>
+  </div>
+  <div class="card clickable-card" onclick="showView('inventory')">
+    <div class="card-title">Top Items by Calories — click to view inventory</div>
+    <div class="top-items-list" id="dash-top-cals"></div>
+  </div>
+</div>
+
+<!-- INVENTORY -->
+<div class="view" id="view-inventory">
+  <div class="view-title">Inventory</div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;display:flex;align-items:center;gap:10px;">
+      <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;">Estimated Survival</div>
+      <div style="display:flex;align-items:baseline;gap:5px;">
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--accent);line-height:1;" id="inv-surv-days">—</div>
+        <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;">days</div>
+      </div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <input type="text" id="inv-search" placeholder="Search items…" oninput="renderInventory()">
+    <select id="inv-type" onchange="renderInventory()">
+      <option value="">All Types</option>
+      <option value="food">Food</option>
+      <option value="water">Water</option>
+      <option value="pet">Pet Supplies</option>
+      <option value="household">Household</option>
+    </select>
+    <select id="inv-cat" onchange="renderInventory()"><option value="">All Categories</option></select>
+    <select id="inv-status" onchange="renderInventory()">
+      <option value="">All Statuses</option>
+      <option value="ok">OK</option>
+      <option value="expiring">Expiring Soon</option>
+      <option value="expired">Expired</option>
+    </select>
+    <button class="btn primary" onclick="openItemModal()">+ Add Inventory</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('name')">Name ↕</th>
+          <th onclick="sortBy('category')">Category ↕</th>
+          <th onclick="sortBy('storageType')">Storage ↕</th>
+          <th onclick="sortBy('dateStored')">Stored ↕</th>
+          <th onclick="sortBy('expDate')">Expires ↕</th>
+          <th onclick="sortBy('qty')">Qty ↕</th>
+          <th onclick="sortBy('calories')">Calories ↕</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="inv-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div class="view" id="view-alerts">
+  <div class="view-title">Alerts</div>
+  <div class="view-sub">Items and conditions requiring attention.</div>
+  <div id="alerts-panel"></div>
+</div>
+
+<!-- BASELINE -->
+<div class="view" id="view-baseline">
+  <div class="view-title">Baseline Goals</div>
+  <div class="view-sub">Set minimum storage targets and compare against your inventory.</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;display:flex;align-items:center;gap:10px;">
+        <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;">Estimated Survival</div>
+        <div style="display:flex;align-items:baseline;gap:5px;">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--accent);line-height:1;" id="bl-surv-days">—</div>
+          <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;">days</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn primary" onclick="showStartHereResults()">Go to Start Here Results →</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchBaselineTab('food',this)">Food</div>
+    <div class="tab" onclick="switchBaselineTab('water',this)">Water</div>
+    <div class="tab" onclick="switchBaselineTab('pet',this)">Pet Supplies</div>
+    <div class="tab" onclick="switchBaselineTab('household',this)">Household & Hygiene</div>
+  </div>
+  <div id="baseline-tab-food" class="tab-pane active"></div>
+  <div id="baseline-tab-water" class="tab-pane"></div>
+  <div id="baseline-tab-pet" class="tab-pane"></div>
+  <div id="baseline-tab-household" class="tab-pane"></div>
+</div>
+
+<!-- LOG -->
+<div class="view" id="view-log">
+  <div class="view-title">Activity Log</div>
+  <div class="view-sub">Timestamped record of all changes.</div>
+  <div class="btns" style="margin-bottom:14px;">
+    <button class="btn danger sm" onclick="clearLog()">Clear Log</button>
+  </div>
+  <div class="card" style="padding:0;"><div id="log-list"></div></div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="view" id="view-instructions">
+  <div class="view-title">How to Use Stockkept</div>
+  <div class="view-sub">A guide to all features of your long-term storage tracker.</div>
+  <div class="card">
+    <div class="instructions-section">
+      <h3>Getting Started</h3>
+      <p>New to Stockkept? Click <strong>Start Here</strong> in the sidebar. Answer 5 quick questions about your household and goals — Stockkept will generate recommended baseline goals automatically and give you smart suggestions tailored to your situation.</p>
+    </div>
+    <div class="instructions-section">
+      <h3>Adding Items to Inventory</h3>
+      <p>Click <strong>+ Add Inventory</strong> in the header to open the item form. Required fields vary by type: Food and Water require an expiration date and calories (food only). Date Stored is required for all items. Water items use gallons or liters only and auto-fill the name "Water".</p>
+      <div class="tip">Tip: When editing an item, the form shows the item's current age based on the stored date.</div>
+    </div>
+    <div class="instructions-section">
+      <h3>Alerts & Notifications</h3>
+      <p>Stockkept auto-generates alerts for expired items (red), items expiring within 90 days (amber), baseline shortfalls (blue), and milestone achievements (gold). Dismissing an alert from the Alerts page hides it without deleting the underlying item. You can also add custom alerts with three severity levels.</p>
+    </div>
+    <div class="instructions-section">
+      <h3>Baseline Goals</h3>
+      <p>Set minimum storage targets per category. Food goals track calories; pet goals track weight; household and water goals track volume or quantity. Add a note to any goal for additional context. Click <strong>Log Item</strong> on a goal to add inventory directly for that category.</p>
+    </div>
+    <div class="instructions-section">
+      <h3>Import, Export & Reset</h3>
+      <p>Data is saved automatically to your browser. Use Export JSON to back up your data to a file, and Import JSON to restore. Reset All permanently erases everything — export first.</p>
+    </div>
+  </div>
+</div>
+
+<!-- START HERE -->
+<div class="view" id="view-starthere">
+  <div class="view-title">Start Here</div>
+  <div class="view-sub">New to building a preparedness supply? Answer a few questions and we'll set up your starting goals.</div>
+  <div id="starthere-content"></div>
+</div>
+<!-- LEGAL NOTICES -->
+<div class="view" id="view-legal">
+  <div class="view-title">Legal Notices</div>
+  <div class="view-sub">Terms, disclaimers, and policies governing your use of Stockkept.</div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px;">Stockkept is owned and operated by North American Health Sciences LLC (NAHSCO). Last updated: 2025.</div>
+
+    <div class="instructions-section">
+      <h3>Accuracy and Currency of Information</h3>
+      <p>Stockkept.com is provided for general informational and personal planning purposes only. North American Health Sciences LLC reserves the right to modify, update, or discontinue any aspect of this application at any time and without prior notice. While we strive to keep information current and accurate, North American Health Sciences LLC makes no representations or warranties regarding the completeness, accuracy, or timeliness of any content within the application. NAHSCO assumes no liability for any damages — direct, indirect, incidental, or consequential — arising from errors, omissions, technical issues, or discrepancies within the application or its data.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>"As Is" Disclaimer</h3>
+      <p>Stockkept, including all data, software, calculations, and documentation, is provided <strong>"as is"</strong> without warranty of any kind, whether express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement. North American Health Sciences LLC (NAHSCO), its affiliates, agents, and licensors expressly disclaim all such warranties to the fullest extent permitted by applicable law.</p>
+      <p>Survival estimates, calorie calculations, baseline goals, and related figures generated by Stockkept are approximations intended for general planning purposes only. They do not constitute professional nutritional, medical, emergency management, or survival advice. Users should consult qualified professionals for guidance specific to their circumstances.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>Limitation of Liability</h3>
+      <p>To the fullest extent permitted by law, North American Health Sciences LLC shall not be liable for any damages or injury of any kind arising from your use of or inability to use Stockkept, including but not limited to: failures of performance, errors, omissions, interruptions, defects, delays in operation or transmission, computer viruses, communication failures, unauthorized access to or alteration of your data, or reliance on any information provided by the application. This limitation applies regardless of the legal theory under which a claim is brought, including breach of contract, negligence, or any other cause of action.</p>
+      <p>Your use of Stockkept is at your sole risk. North American Health Sciences LLC does not warrant that the application will meet your specific preparedness needs or that its estimates and recommendations will be accurate for your particular situation.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>Third-Party Links</h3>
+      <p>Stockkept may contain links to third-party websites or services not maintained or controlled by NAHSCO. These links are provided for convenience only. North American Health Sciences LLC does not endorse, guarantee, or assume responsibility for the content, accuracy, or practices of any third-party site. The inclusion of any link does not imply affiliation with or endorsement by NAHSCO. Users access third-party sites at their own risk and should review the applicable terms and privacy policies of those sites.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>User Communications and Feedback</h3>
+      <p>By submitting feedback, messages, or communications through any feedback mechanism associated with Stockkept, you grant NAHSCO a non-exclusive, royalty-free, perpetual license to use, reproduce, and display such communications for purposes including product improvement, promotional materials, and testimonials, with reasonable attribution where practicable. You represent that any feedback you submit is your own and does not infringe the rights of any third party.</p>
+      <p>Communications and testimonials published in connection with Stockkept represent the views of individual users and do not reflect the opinions or positions of NAHSCO. NAHSCO reserves the right to decline to publish or to remove any submission at its discretion.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>Data and Privacy</h3>
+      <p>This downloaded copy of Stockkept stores all user data locally within your browser using standard localStorage technology. North American Health Sciences LLC does not collect, transmit, store, or have access to any personal information or inventory data you enter into the application. Because this is a local copy opened directly in your browser, no third-party hosting is involved and no IP logging occurs.</p>
+      <p>If you click the "Buy Me a Can of Beans" button, you are leaving the Stockkept application and Ko-fi's and Stripe's privacy policies govern that transaction. You are encouraged to review those policies before completing any donation.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>Intellectual Property</h3>
+      <p>The Stockkept application, including its name, design, code, graphics, interface, and all related content, is the proprietary intellectual property of NAHSCO and is protected by applicable copyright, trademark, and other intellectual property laws. The Stockkept name and any associated marks are trademarks of NAHSCO. Unauthorized reproduction, distribution, modification, or commercial use of any portion of Stockkept without express written permission from NAHSCO is prohibited.</p>
+      <p>You may use Stockkept for personal, non-commercial household planning purposes. If you have purchased a licensed download, that license is granted to you personally and is non-transferable.</p>
+    </div>
+
+    <div class="instructions-section">
+      <h3>Governing Law</h3>
+      <p>These notices and your use of Stockkept are governed by the laws of the applicable jurisdiction in which NAHSCO is established, without regard to conflict of law principles. Any disputes arising from your use of Stockkept shall be resolved in the appropriate courts of that jurisdiction.</p>
+    </div>
+
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+      <p style="font-size:12px;color:var(--text3);line-height:1.7;">© 2025 North American Health Sciences LLC. All rights reserved. Stockkept is a product of NAHSCO. For questions regarding these notices, please use the Feedback / Bug Report link in the sidebar.</p>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+</div>
+
+<!-- WELCOME MODAL (download version only) -->
+<div class="modal-overlay" id="modal-welcome">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title">Welcome to Stockkept</div>
+      <button class="modal-close" onclick="closeModal('modal-welcome')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text2);line-height:1.8;margin-bottom:14px;">Thank you for purchasing Stockkept. Your support helps keep this project alive and new features coming.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px;">This is your personal offline copy — everything stays on your device, works without internet, and is yours to keep. We recommend exporting your data regularly as a backup.</p>
+      <div style="background:rgba(200,169,110,0.07);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:12px;color:var(--text2);margin-bottom:18px;">
+        If you find Stockkept valuable over time, buying us a can of beans is always appreciated — it supports ongoing development.
+      </div>
+      <div style="text-align:center;">
+        <button class="btn-save" onclick="closeModal('modal-welcome')" style="min-width:180px;">Get Started →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT MODAL -->
+<div class="modal-overlay" id="modal-support">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">A note from the Stockkept team</div>
+      <button class="modal-close" onclick="closeModal('modal-support')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text2);line-height:1.8;margin-bottom:18px;">Stockkept is built by a small, independent team. Thank you for supporting us with your purchase — it means a great deal and keeps this project going.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;">If you'd like to contribute further, buying us a can of beans goes a long way toward new features and updates.</p>
+      <div class="btns" style="justify-content:center;gap:12px;margin-bottom:20px;">
+        <button class="btn primary" style="padding:9px 20px;font-size:13px;" onclick="window.open('https://ko-fi.com/stockkept','_blank')">🫘 Buy Me a Can of Beans</button>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;text-align:center;">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:12px;">No additional purchase necessary — enjoy Stockkept on your device.</p>
+        <button class="btn-save" id="support-action-btn" style="min-width:160px;"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT ITEM MODAL -->
+<div class="modal-overlay" id="modal-item">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-item-title">Add Inventory Item</div>
+      <button class="modal-close" onclick="closeModal('modal-item')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="fi-age-display" style="display:none;margin-bottom:12px;padding:8px 12px;background:var(--bg3);border-radius:var(--radius-sm);font-size:12px;color:var(--text2);">
+        Age since stored: <span id="fi-age-val" class="age-pill"></span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Item Name <span class="req">*</span></label>
+          <input type="text" id="fi-name" placeholder="e.g. White Rice – 25 lb Mylar">
+        </div>
+        <div class="form-group">
+          <label>Type <span class="req">*</span></label>
+          <select id="fi-type" onchange="onItemTypeChange()">
+            <option value="food">Food</option>
+            <option value="water">Water</option>
+            <option value="pet">Pet Supplies</option>
+            <option value="household">Household & Hygiene</option>
+          </select>
+        </div>
+        <div class="form-group" id="fi-cat-group">
+          <label>Category <span class="req">*</span></label>
+          <select id="fi-category" onchange="onCategoryChange()"></select>
+        </div>
+        <div class="form-group full" id="fi-custom-cat-group" style="display:none;">
+          <label>Custom Category Name <span class="req">*</span></label>
+          <input type="text" id="fi-custom-cat" placeholder="Enter category name…">
+        </div>
+        <div class="form-group" id="fi-storage-group">
+          <label>Storage Type</label>
+          <select id="fi-storageType">
+            <option>Mylar Bag</option><option>Mason Jar</option><option>5-Gallon Bucket</option>
+            <option>Can (Commercial)</option><option>Can (Home)</option><option>Vacuum Sealed</option>
+            <option>Freeze-Dried Can</option><option>Original Packaging</option>
+            <option>Box</option><option>Bottle</option><option>Jug</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date Stored <span class="req">*</span></label>
+          <input type="date" id="fi-dateStored">
+        </div>
+        <div class="form-group">
+          <label id="fi-exp-label">Expiration Date <span class="req" id="fi-exp-req">*</span></label>
+          <input type="date" id="fi-expDate">
+        </div>
+        <div class="form-group">
+          <label>Quantity <span class="req">*</span></label>
+          <div class="qty-row">
+            <input type="number" id="fi-qty" min="0" step="1" value="0" oninput="onQtyChange('qty')">
+            <select id="fi-qtyUnit"></select>
+          </div>
+        </div>
+        <div class="form-group" id="fi-cal-group">
+          <label>Total Calories <span class="req">*</span></label>
+          <input type="number" id="fi-calories" min="0" step="1" value="0" oninput="onQtyChange('cal')">
+        </div>
+        <div class="form-group full">
+          <label>Notes</label>
+          <textarea id="fi-notes" rows="2" placeholder="Optional notes…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-item')">Cancel</button>
+      <button class="btn-save" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG USAGE MODAL -->
+<div class="modal-overlay" id="modal-use">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">Log Usage</div>
+      <button class="modal-close" onclick="closeModal('modal-use')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg">Record usage for: <strong id="use-item-name"></strong></p>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Amount Used</label>
+        <div class="qty-row">
+          <input type="number" id="use-qty" min="0" step="1" value="0">
+          <input type="text" id="use-unit-disp" style="width:80px;" disabled>
+        </div>
+      </div>
+      <div class="form-group" id="use-cal-row" style="margin-bottom:12px;">
+        <label>Calories Removed (auto-calculated, editable)</label>
+        <input type="number" id="use-cals" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" id="use-consume-all" onchange="toggleConsumeAll()"> Mark entire item as consumed</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-use')">Cancel</button>
+      <button class="btn-save" onclick="saveUsage()">Log Usage</button>
+    </div>
+  </div>
+</div>
+
+<!-- BASELINE GOAL MODAL -->
+<div class="modal-overlay" id="modal-baseline">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title" id="baseline-modal-title">Set Baseline Goal</div>
+      <button class="modal-close" onclick="closeModal('modal-baseline')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Type</label>
+          <select id="bg-type" onchange="onBaselineTypeChange()">
+            <option value="food">Food</option>
+            <option value="water">Water</option>
+            <option value="pet">Pet Supplies</option>
+            <option value="household">Household & Hygiene</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="bg-category" onchange="onBaselineCatChange()"></select>
+        </div>
+        <div class="form-group full" id="bg-custom-cat-group" style="display:none;">
+          <label>Custom Category Name</label>
+          <input type="text" id="bg-custom-cat" placeholder="Enter category name…">
+        </div>
+        <div class="form-group full" id="bg-cal-group">
+          <label>Target Calories</label>
+          <input type="number" id="bg-calories" min="0" value="0">
+        </div>
+        <div class="form-group" id="bg-weight-group" style="display:none;">
+          <label>Target Weight</label>
+          <input type="number" id="bg-weight" min="0" value="0">
+        </div>
+        <div class="form-group" id="bg-weight-unit-group" style="display:none;">
+          <label>Unit</label>
+          <select id="bg-weight-unit"><option>lbs</option><option>oz</option><option>kg</option><option>g</option></select>
+        </div>
+        <div class="form-group" id="bg-qty-group" style="display:none;">
+          <label id="bg-qty-label">Target Amount</label>
+          <input type="number" id="bg-qty" min="0" value="0">
+        </div>
+        <div class="form-group" id="bg-qty-unit-group" style="display:none;">
+          <label>Unit</label>
+          <select id="bg-qty-unit"><option>count</option><option>lbs</option><option>oz</option><option>kg</option><option>g</option><option>gallons</option><option>liters</option><option>floz</option></select>
+        </div>
+        <div class="form-group full">
+          <label>Notes (optional)</label>
+          <textarea id="bg-notes" rows="2" placeholder="Describe this goal, notes on sourcing, rotation schedule, etc."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-baseline')">Cancel</button>
+      <button class="btn-save" onclick="saveBaseline()">Save Goal</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title" id="conf-title">Confirm</div>
+      <button class="modal-close" onclick="closeModal('modal-confirm')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="conf-msg" class="confirm-msg"></div>
+      <div id="conf-disclaimer" style="display:none;" class="rec-disclaimer"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-confirm')">Cancel</button>
+      <button class="btn-save" id="conf-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM ALERT MODAL -->
+<div class="modal-overlay" id="modal-alert">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title" id="alert-modal-title">Add Custom Alert</div>
+      <button class="modal-close" onclick="closeModal('modal-alert')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Alert Message</label>
+          <textarea id="alert-msg-input" rows="3" placeholder="Describe this alert…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Severity</label>
+          <select id="alert-severity">
+            <option value="red">Critical (Red)</option>
+            <option value="amber">Warning (Amber)</option>
+            <option value="blue">Info (Blue)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-alert')">Cancel</button>
+      <button class="btn-save" onclick="saveCustomAlert()">Save Alert</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const FOOD_CATS=['Grains & Flour','Legumes','Oils & Fats','Sweeteners','Dairy','Proteins','Fruits & Veg','Beverages','Spices & Seasonings','Other Food'];
+const WATER_CATS=['Drinking Water','Filtered Water','Treated Water','Other Water'];
+const PET_CATS=['Dry Dog Food','Wet Dog Food','Dry Cat Food','Wet Cat Food','Dog Treats','Cat Treats','Medicine (Dog)','Medicine (Cat)','Bedding','Hygiene','Accessories','Other Pet'];
+const HH_CATS=['Paper Products','Cleaning Supplies','Personal Hygiene','First Aid','Medications','Batteries & Power','Fuel','Other Household'];
+const ALL_UNITS=['lbs','oz','kg','g','count','gallons','liters','floz'];
+const WATER_UNITS=['gallons','liters'];
+
+const REC_GRAINS_CAL_PER_PERSON_YEAR=640000;
+const REC_LEGUMES_CAL_PER_PERSON_YEAR=91000;
+const REC_DOG_SM_LBS_YEAR=150;
+const REC_DOG_MD_LBS_YEAR=450;
+const REC_DOG_LG_LBS_YEAR=700;
+const REC_CAT_LBS_YEAR=30;
+const REC_WATER_GAL_PERSON_YEAR=365;
+const REC_WATER_GAL_DOG_YEAR=180;
+const REC_WATER_GAL_CAT_YEAR=25;
+
+const MILESTONES=[{days:7,label:'7-Day Milestone'},{days:30,label:'30-Day Milestone'},{days:100,label:'100-Day Milestone'},{days:365,label:'One-Year Milestone'}];
+
+// ============================================================
+// STATE
+// ============================================================
+const defaultState=()=>({items:[],baselines:[],log:[],customAlerts:[],dismissedAlerts:[],achievedMilestones:[]});
+let state=defaultState();
+let editingId=null,usingId=null,sortCol='name',sortDir=1;
+let pendingImportEvent=null;
+
+// Dismissed item-level alert IDs (session only — items stay in inventory)
+let sessionDismissed=new Set();
+
+function save(){localStorage.setItem('stockkept_v2',JSON.stringify(state));}
+function load(){
+  const raw=localStorage.getItem('stockkept_v2');
+  if(raw){try{state={...defaultState(),...JSON.parse(raw)};}catch(e){}}
+  sessionDismissed=new Set(state.dismissedAlerts||[]);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function fmtDate(d){if(!d)return'—';const p=d.split('-');return`${p[1]}/${p[2]}/${p[0]}`;}
+function daysUntil(d){if(!d)return Infinity;return Math.floor((new Date(d)-Date.now())/86400000);}
+function fmtNum(n,dec=0){return n==null||isNaN(n)?'—':Number(n).toLocaleString(undefined,{maximumFractionDigits:dec,minimumFractionDigits:0});}
+function fmtQty(item){return`${fmtNum(item.qty,1)} ${item.qtyUnit||'lbs'}`;}
+function toLbs(qty,unit){
+  const u=(unit||'lbs').toLowerCase(),q=parseFloat(qty)||0;
+  if(u==='lbs')return q;if(u==='oz')return q/16;
+  if(u==='kg')return q*2.20462;if(u==='g')return q*0.00220462;
+  return q;
+}
+function itemStatus(item){
+  if(!item.expDate)return'ok';
+  const d=daysUntil(item.expDate);
+  if(d<0)return'expired';if(d<=90)return'expiring';return'ok';
+}
+function logAction(desc){
+  state.log.unshift({id:uid(),ts:new Date().toISOString(),desc});
+  if(state.log.length>500)state.log.pop();
+}
+function getCats(type){
+  if(type==='water')return WATER_CATS;if(type==='pet')return PET_CATS;
+  if(type==='household')return HH_CATS;return FOOD_CATS;
+}
+function getOtherCatName(type){
+  if(type==='water')return'Other Water';if(type==='pet')return'Other Pet';
+  if(type==='household')return'Other Household';return'Other Food';
+}
+function itemAge(dateStored){
+  if(!dateStored)return null;
+  const start=new Date(dateStored),now=new Date();
+  let y=now.getFullYear()-start.getFullYear(),m=now.getMonth()-start.getMonth(),d=now.getDate()-start.getDate();
+  if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate();}
+  if(m<0){y--;m+=12;}
+  const parts=[];if(y>0)parts.push(`${y}y`);if(m>0)parts.push(`${m}mo`);if(d>0||!parts.length)parts.push(`${d}d`);
+  return parts.join(' ');
+}
+function calcSurvivalDays(){
+  const people=parseInt(document.getElementById('surv-people')?.value)||1;
+  const calDay=parseInt(document.getElementById('surv-cals')?.value)||2000;
+  const totalCals=state.items.filter(i=>i.type==='food'||!i.type).reduce((s,i)=>s+(parseFloat(i.calories)||0),0);
+  return calDay>0&&people>0?(totalCals/(calDay*people)):0;
+}
+
+// ============================================================
+// MILESTONE CHECKS
+// ============================================================
+function checkMilestones(){
+  const days=calcSurvivalDays();
+  if(!state.achievedMilestones)state.achievedMilestones=[];
+  MILESTONES.forEach(m=>{
+    if(days>=m.days&&!state.achievedMilestones.includes(m.days)){
+      state.achievedMilestones.push(m.days);
+      save();
+      showMilestoneToast(m.label,days);
+      logAction(`🏆 Milestone reached: ${m.label} — ${days.toFixed(1)} estimated survival days`);
+    }
+  });
+}
+function showMilestoneToast(title,days){
+  const msgs={
+    7:'Great start! You have a one-week buffer for your household.',
+    30:'A full month of preparedness — you\'re ahead of most households.',
+    100:'100 days is a serious achievement. Well done.',
+    365:'One year of estimated survival. Remarkable dedication.'
+  };
+  const key=Object.keys(msgs).find(k=>title.includes(k));
+  const body=msgs[key]||`You now have ${days.toFixed(1)} estimated survival days stored.`;
+  // Show persistent toast (no auto-dismiss)
+  document.getElementById('toast-title').textContent=`🏆 ${title} Reached!`;
+  document.getElementById('toast-body').textContent=body;
+  document.getElementById('milestone-toast').classList.add('show');
+  // Also add to custom alerts so it appears in Alerts section
+  if(!state.customAlerts)state.customAlerts=[];
+  state.customAlerts.unshift({id:'milestone-'+uid(),msg:`🏆 ${title} Reached! ${body}`,sev:'amber',isMilestone:true});
+  save();
+}
+function dismissMilestoneToast(){
+  document.getElementById('milestone-toast').classList.remove('show');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navEl=document.querySelector(`.nav-item[data-view="${id}"]`);
+  if(navEl)navEl.classList.add('active');
+  if(id==='dashboard')renderDashboard();
+  if(id==='inventory')renderInventory();
+  if(id==='alerts')renderAlerts();
+  if(id==='baseline')renderBaseline();
+  if(id==='log')renderLog();
+  if(id==='starthere')renderStartHere();
+  updateBadges();
+}
+function renderView_current(){
+  const id=currentView();
+  if(id==='dashboard')renderDashboard();
+  else if(id==='inventory')renderInventory();
+  else if(id==='alerts')renderAlerts();
+  else if(id==='baseline')renderBaseline();
+  else if(id==='log')renderLog();
+  else if(id==='starthere')renderStartHere();
+  updateBadges();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(){
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  updateSurvival();
+  updateStartHereButton();
+  updateBadges();
+
+  const foodItems=state.items.filter(i=>i.type==='food'||!i.type);
+  const totalCals=foodItems.reduce((s,i)=>s+(parseFloat(i.calories)||0),0);
+  const expired=state.items.filter(i=>itemStatus(i)==='expired').length;
+  const expiring=state.items.filter(i=>itemStatus(i)==='expiring').length;
+  const alertCount=expired+expiring+(state.customAlerts?.length||0);
+
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat-card" onclick="showView('inventory')" title="View Inventory">
+      <div class="stat-label">Total Items</div>
+      <div class="stat-val accent">${state.items.length}</div>
+      <div class="stat-sub">${foodItems.length} food items · click to view</div>
+    </div>
+    <div class="stat-card" onclick="showView('inventory')" title="View Inventory">
+      <div class="stat-label">Total Calories</div>
+      <div class="stat-val green">${fmtNum(totalCals)}</div>
+      <div class="stat-sub">food items only · click to view</div>
+    </div>
+    <div class="stat-card" onclick="showView('alerts')" title="View Alerts">
+      <div class="stat-label">Active Alerts</div>
+      <div class="stat-val ${alertCount>0?(expired>0?'red':'amber'):'green'}">${alertCount}</div>
+      <div class="stat-sub">${expired} expired · ${expiring} expiring · click to view</div>
+    </div>`;
+
+  const bl=buildBaselineSummary();
+  document.getElementById('dash-baseline').innerHTML=bl.length?bl.slice(0,7).map(b=>{
+    const pct=Math.min(100,Math.round(b.pct));
+    const cls=pct>=100?'green':pct>=60?'amber':'red';
+    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;">
+      <div style="width:140px;font-size:11.5px;color:var(--text2);flex-shrink:0;">${b.label}</div>
+      <div style="flex:1;"><div class="progress-wrap"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div></div>
+      <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--${cls});width:34px;text-align:right;">${pct}%</div>
+    </div>`;}).join(''):'<div style="color:var(--text3);font-size:12.5px;">No baseline goals set. Click to add goals.</div>';
+
+  const alertItems=getAlertItems();
+  const custom=state.customAlerts||[];
+  const all=[...alertItems,...custom];
+  document.getElementById('dash-alerts').innerHTML=all.length?all.slice(0,6).map(a=>`
+    <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);">
+      <span class="badge ${a.sev||'red'}">${a.sev==='amber'?'Warning':a.sev==='blue'?'Info':a.sev==='green'?'Tip':'Alert'}</span>
+      <span style="font-size:12.5px;color:var(--text2);">${a.label||a.msg}</span>
+    </div>`).join(''):'<div style="color:var(--green);font-size:12.5px;">No active alerts — all clear!</div>';
+
+  const top=[...foodItems].sort((a,b)=>(parseFloat(b.calories)||0)-(parseFloat(a.calories)||0)).slice(0,6);
+  const maxCal=top.length?(parseFloat(top[0].calories)||1):1;
+  document.getElementById('dash-top-cals').innerHTML=top.length?top.map(i=>`
+    <div class="ti">
+      <div class="ti-name">${i.name}</div>
+      <div style="flex:1;margin:0 10px;"><div class="progress-wrap"><div class="progress-fill accent" style="width:${Math.round((parseFloat(i.calories)||0)/maxCal*100)}%"></div></div></div>
+      <div class="ti-val">${fmtNum(parseFloat(i.calories)||0)}</div>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:12.5px;">No food items yet. Click to add inventory.</div>';
+}
+
+function updateSurvival(){
+  const days=calcSurvivalDays();
+  const el=document.getElementById('surv-days');
+  if(el)el.textContent=days>0?days.toFixed(1):'0.0';
+  const inv=document.getElementById('inv-surv-days');
+  if(inv)inv.textContent=days>0?days.toFixed(1):'0.0';
+  const bl=document.getElementById('bl-surv-days');
+  if(bl)bl.textContent=days>0?days.toFixed(1):'0.0';
+  checkMilestones();
+}
+
+function updateStartHereButton(){
+  const noItems=state.items.length===0;
+  const noBaselines=(state.baselines||[]).length===0;
+  const show=noItems||noBaselines;
+  const btn=document.getElementById('hdr-starthere-btn');
+  const spacer=document.getElementById('hdr-spacer');
+  if(btn){btn.style.display=show?'':'none';}
+  if(spacer){spacer.style.display=show?'none':'block';}
+}
+
+// ============================================================
+// ALERTS (system)
+// ============================================================
+function getAlertItems(){
+  const alerts=[];
+  const noItems=state.items.length===0;
+  const noBaselines=(state.baselines||[]).length===0;
+  const surveyComplete=shStep>=SH_STEPS.length;
+
+  // Onboarding: only show if no items AND no baselines AND survey not complete
+  if((noItems||noBaselines)&&!surveyComplete){
+    alerts.push({id:'onboard-start',label:'Welcome to Stockkept! Visit Start Here to set up your preparedness goals.',sev:'green',isOnboard:true});
+  }
+
+  // Zero survival days
+  if(calcSurvivalDays()<0.1&&noItems){
+    alerts.push({id:'zero-surv',label:'No food items in inventory yet. Add items to begin tracking your survival estimate.',sev:'amber',isOnboard:true});
+  }
+
+  // Expired / expiring items
+  state.items.forEach(item=>{
+    const alertId='item-'+item.id;
+    if(sessionDismissed.has(alertId))return;
+    const st=itemStatus(item);
+    if(st==='expired')alerts.push({id:alertId,label:`${item.name} expired ${Math.abs(daysUntil(item.expDate))} days ago`,sev:'red',itemId:item.id,dismissable:true});
+    else if(st==='expiring')alerts.push({id:alertId,label:`${item.name} expires in ${daysUntil(item.expDate)} days`,sev:'amber',itemId:item.id,dismissable:true});
+  });
+
+  // Zero quantity items
+  state.items.forEach(item=>{
+    const zeroId='zero-'+item.id;
+    if(sessionDismissed.has(zeroId))return;
+    if((parseFloat(item.qty)||0)<=0){
+      alerts.push({id:zeroId,label:`${item.name} has 0 quantity remaining — consider restocking.`,sev:'amber',itemId:item.id,dismissable:true});
+    }
+  });
+
+  // Baseline shortfalls
+  buildBaselineSummary().filter(b=>b.pct<100).forEach(b=>{
+    alerts.push({id:'bl-'+b.key,label:`Baseline shortfall: ${b.label} (${Math.round(b.pct)}% of goal)`,sev:'blue',isBaseline:true});
+  });
+  return alerts;
+}
+
+function renderAlerts(){
+  const panel=document.getElementById('alerts-panel');
+  const auto=getAlertItems();
+  const custom=state.customAlerts||[];
+  let html='';
+  if(!auto.length&&!custom.length){
+    html=`<div class="empty"><div class="empty-ico">✓</div><div class="empty-title">No alerts — all clear!</div></div>`;
+  }
+  if(auto.length){
+    html+=`<div class="section-header"><div class="section-title">System Alerts (${auto.length})</div></div>`;
+    auto.forEach(a=>{
+      const ico=a.sev==='red'?'✕':a.sev==='amber'?'⚠':a.sev==='green'?'★':'ℹ';
+      html+=`<div class="alert-item ${a.sev}">
+        <div class="alert-icon">${ico}</div>
+        <div style="flex:1;">
+          <div class="alert-title">${a.label}</div>
+          <div class="alert-actions btns">
+            ${a.isOnboard?`<button class="btn sm primary" onclick="showView('starthere')">Go to Start Here</button>`:''}
+            ${a.itemId?`<button class="btn sm" onclick="openItemModal('${a.itemId}')">Edit Item</button><button class="btn sm green" onclick="openUseModal('${a.itemId}')">Log Usage</button>`:''}
+            ${a.isBaseline?`<button class="btn sm blue" onclick="showView('baseline')">View Baseline Goals</button>`:''}
+            ${a.dismissable?`<button class="btn sm" onclick="dismissItemAlert('${a.id}')">Dismiss</button>`:''}
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  if(custom.length){
+    html+=`<div class="section-header" style="margin-top:16px;"><div class="section-title">Custom Alerts (${custom.length})</div></div>`;
+    custom.forEach(a=>{
+      html+=`<div class="alert-item ${a.sev}">
+        <div class="alert-icon">${a.sev==='red'?'✕':a.sev==='amber'?'⚠':'ℹ'}</div>
+        <div style="flex:1;">
+          <div class="alert-title">${a.msg}</div>
+          <div class="alert-actions btns" style="margin-top:6px;">
+            <button class="btn sm" onclick="editCustomAlert('${a.id}')">Edit</button>
+            <button class="btn sm danger" onclick="deleteCustomAlert('${a.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  html+=`<div style="margin-top:14px;"><button class="btn primary" onclick="openAlertModal()">+ Add Custom Alert</button></div>`;
+  panel.innerHTML=html;
+}
+
+function dismissItemAlert(alertId){
+  showConfirm(
+    'Dismiss this alert? The item will remain in your inventory with its expiration date intact, but you will no longer be alerted for this specific item.',
+    ()=>{
+      sessionDismissed.add(alertId);
+      if(!state.dismissedAlerts)state.dismissedAlerts=[];
+      if(!state.dismissedAlerts.includes(alertId))state.dismissedAlerts.push(alertId);
+      save();renderAlerts();updateBadges();
+    },
+    'Dismiss Alert'
+  );
+}
+
+function openAlertModal(id){
+  const a=id?(state.customAlerts||[]).find(x=>x.id===id):null;
+  document.getElementById('alert-modal-title').textContent=id?'Edit Alert':'Add Custom Alert';
+  document.getElementById('alert-msg-input').value=a?.msg||'';
+  document.getElementById('alert-severity').value=a?.sev||'amber';
+  document.getElementById('modal-alert').dataset.editId=id||'';
+  document.getElementById('modal-alert').classList.add('open');
+}
+function editCustomAlert(id){openAlertModal(id);}
+function saveCustomAlert(){
+  if(!state.customAlerts)state.customAlerts=[];
+  const msg=document.getElementById('alert-msg-input').value.trim();
+  if(!msg)return;
+  const sev=document.getElementById('alert-severity').value;
+  const editId=document.getElementById('modal-alert').dataset.editId;
+  if(editId){const a=state.customAlerts.find(x=>x.id===editId);if(a){a.msg=msg;a.sev=sev;}}
+  else{state.customAlerts.push({id:uid(),msg,sev});logAction(`Added custom alert: ${msg}`);}
+  save();closeModal('modal-alert');renderAlerts();updateBadges();
+}
+function deleteCustomAlert(id){
+  showConfirm('Delete this custom alert?',()=>{
+    state.customAlerts=(state.customAlerts||[]).filter(a=>a.id!==id);
+    save();renderAlerts();updateBadges();
+  });
+}
+
+// ============================================================
+// INVENTORY
+// ============================================================
+function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}renderInventory();}
+
+function renderInventory(){
+  // Sync survival banner
+  const days=calcSurvivalDays();
+  const inv=document.getElementById('inv-surv-days');
+  if(inv)inv.textContent=days>0?days.toFixed(1):'0.0';
+
+  const q=(document.getElementById('inv-search')?.value||'').toLowerCase();
+  const typeF=document.getElementById('inv-type')?.value||'';
+  const catF=document.getElementById('inv-cat')?.value||'';
+  const statusF=document.getElementById('inv-status')?.value||'';
+
+  const cats=[...new Set(state.items.map(i=>i.category).filter(Boolean))].sort();
+  const catSel=document.getElementById('inv-cat');
+  if(catSel){const cur=catSel.value;catSel.innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option ${c===cur?'selected':''}>${c}</option>`).join('');if(cur)catSel.value=cur;}
+
+  let items=[...state.items];
+  if(q)items=items.filter(i=>(i.name||'').toLowerCase().includes(q)||(i.category||'').toLowerCase().includes(q));
+  if(typeF)items=items.filter(i=>(i.type||'food')===typeF);
+  if(catF)items=items.filter(i=>i.category===catF);
+  if(statusF)items=items.filter(i=>itemStatus(i)===statusF);
+  items.sort((a,b)=>{
+    let av=a[sortCol]??'',bv=b[sortCol]??'';
+    if(sortCol==='qty'||sortCol==='calories'){av=parseFloat(av)||0;bv=parseFloat(bv)||0;}
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+
+  const tbody=document.getElementById('inv-tbody');
+  if(!items.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:30px;">No items found.</td></tr>`;return;}
+  tbody.innerHTML=items.map(item=>{
+    const st=itemStatus(item),d=daysUntil(item.expDate);
+    const cls=st==='expired'?'row-expired':st==='expiring'?'row-expiring':'row-ok';
+    const badge=st==='expired'?`<span class="badge red">Expired</span>`:st==='expiring'?`<span class="badge amber">In ${d}d</span>`:`<span class="badge green">OK</span>`;
+    const type=item.type||'food';
+    const typeBadge=type==='pet'?`<span class="badge purple" style="margin-left:4px;font-size:9.5px;">Pet</span>`:type==='household'?`<span class="badge blue" style="margin-left:4px;font-size:9.5px;">HH</span>`:type==='water'?`<span class="badge teal" style="margin-left:4px;font-size:9.5px;">H₂O</span>`:'';
+    const calDisp=type==='food'?fmtNum(parseFloat(item.calories)||0):'—';
+    const expDisp=item.expDate?`<span style="color:${st==='expired'?'var(--red)':st==='expiring'?'var(--amber)':'var(--text2)'}">${fmtDate(item.expDate)}</span>`:`<span style="color:var(--text3);">—</span>`;
+    return`<tr class="${cls}">
+      <td><strong style="font-size:12.5px;">${item.name}</strong>${typeBadge}</td>
+      <td>${item.category||'—'}</td>
+      <td>${item.storageType||'—'}</td>
+      <td style="font-size:11.5px;color:var(--text3);">${fmtDate(item.dateStored)}</td>
+      <td style="font-size:11.5px;">${expDisp}</td>
+      <td style="font-family:var(--font-mono);font-size:12px;">${fmtQty(item)}</td>
+      <td style="font-family:var(--font-mono);font-size:12px;">${calDisp}</td>
+      <td>${badge}</td>
+      <td><div class="btns">
+        <button class="btn sm green" onclick="openUseModal('${item.id}')">Use</button>
+        <button class="btn sm" onclick="openItemModal('${item.id}')">Edit</button>
+        <button class="btn sm danger" onclick="deleteItem('${item.id}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// ITEM MODAL
+// ============================================================
+function openItemModal(id,prefillCategory,prefillType){
+  editingId=id||null;
+  document.getElementById('modal-item-title').textContent=id?'Edit Inventory Item':'Add Inventory Item';
+  const item=id?state.items.find(i=>i.id===id):{};
+  const type=item?.type||prefillType||'food';
+  document.getElementById('fi-type').value=type;
+  document.getElementById('fi-name').value=item?.name||'';
+  populateItemCategorySelect(type,item?.category||prefillCategory);
+  populateItemUnits(type,item?.qtyUnit);
+  document.getElementById('fi-storageType').value=item?.storageType||'Original Packaging';
+  document.getElementById('fi-dateStored').value=item?.dateStored||new Date().toISOString().slice(0,10);
+  document.getElementById('fi-expDate').value=item?.expDate||'';
+  document.getElementById('fi-qty').value=item?.qty||0;
+  document.getElementById('fi-calories').value=item?.calories||0;
+  document.getElementById('fi-notes').value=item?.notes||'';
+  document.getElementById('fi-custom-cat').value=item?.customCat||'';
+  const ageDisp=document.getElementById('fi-age-display');
+  if(id&&item?.dateStored){document.getElementById('fi-age-val').textContent=itemAge(item.dateStored)||'—';ageDisp.style.display='block';}
+  else ageDisp.style.display='none';
+  onItemTypeChange();
+  document.getElementById('modal-item').classList.add('open');
+}
+
+function populateItemCategorySelect(type,current){
+  const cats=getCats(type);
+  const sel=document.getElementById('fi-category');
+  sel.innerHTML=cats.map(c=>`<option value="${c}" ${c===current?'selected':''}>${c}</option>`).join('');
+  const otherLabel=getOtherCatName(type);
+  if(current&&!cats.includes(current)){sel.value=otherLabel;document.getElementById('fi-custom-cat').value=current;}
+  onCategoryChange();
+}
+
+function populateItemUnits(type,current){
+  const units=type==='water'?WATER_UNITS:ALL_UNITS;
+  const sel=document.getElementById('fi-qtyUnit');
+  sel.innerHTML=units.map(u=>`<option ${u===current?'selected':''}>${u}</option>`).join('');
+  if(current&&units.includes(current))sel.value=current;else sel.value=units[0];
+}
+
+function onItemTypeChange(){
+  const t=document.getElementById('fi-type').value;
+  const prevCat=document.getElementById('fi-category').value;
+  populateItemCategorySelect(t,prevCat);
+  populateItemUnits(t,document.getElementById('fi-qtyUnit').value);
+  const isFood=t==='food',isWater=t==='water';
+  document.getElementById('fi-cal-group').style.display=isFood?'':'none';
+  const expReq=document.getElementById('fi-exp-req');
+  if(expReq)expReq.style.display=(isFood||isWater)?'':'none';
+  document.getElementById('fi-storage-group').style.display=isWater?'none':'';
+  // Water auto-name and auto-category
+  const nameEl=document.getElementById('fi-name');
+  if(isWater){
+    if(!nameEl.value.trim()||nameEl.value.trim()==='Water')nameEl.value='Water';
+    document.getElementById('fi-category').value='Drinking Water';
+    // Also auto-fill custom cat if visible
+    const customCatEl=document.getElementById('fi-custom-cat');
+    if(customCatEl)customCatEl.value='Water';
+  } else if(nameEl.value.trim()==='Water'){
+    nameEl.value='';
+  }
+}
+
+function onCategoryChange(){
+  const t=document.getElementById('fi-type').value;
+  const cat=document.getElementById('fi-category').value;
+  document.getElementById('fi-custom-cat-group').style.display=cat===getOtherCatName(t)?'':'none';
+}
+
+function onQtyChange(changed){
+  if(!editingId)return;
+  const item=state.items.find(i=>i.id===editingId);
+  if(!item||!(parseFloat(item.qty)>0))return;
+  if(changed==='qty'&&parseFloat(item.calories)>0){
+    const ratio=(parseFloat(item.calories))/(parseFloat(item.qty));
+    document.getElementById('fi-calories').value=Math.round((parseFloat(document.getElementById('fi-qty').value)||0)*ratio);
+  }else if(changed==='cal'&&parseFloat(item.calories)>0){
+    const ratio=(parseFloat(item.qty))/(parseFloat(item.calories));
+    document.getElementById('fi-qty').value=Math.round((parseFloat(document.getElementById('fi-calories').value)||0)*ratio);
+  }
+}
+
+function saveItem(){
+  const name=document.getElementById('fi-name').value.trim();
+  if(!name){markInvalid('fi-name','Item name is required.');return;}
+  const type=document.getElementById('fi-type').value;
+  const selCat=document.getElementById('fi-category').value;
+  const otherLabel=getOtherCatName(type);
+  const customCatVal=document.getElementById('fi-custom-cat').value.trim();
+  let category=selCat;
+  if(selCat===otherLabel&&customCatVal)category=customCatVal;
+  const dateStored=document.getElementById('fi-dateStored').value;
+  if(!dateStored){markInvalid('fi-dateStored','Date stored is required.');return;}
+  const expDate=document.getElementById('fi-expDate').value;
+  if((type==='food'||type==='water')&&!expDate){markInvalid('fi-expDate','Expiration date is required for food and water.');return;}
+  if(type==='food'){
+    const cal=parseFloat(document.getElementById('fi-calories').value)||0;
+    if(cal<=0){markInvalid('fi-calories','Calories are required for food items.');return;}
+  }
+  const item={
+    id:editingId||uid(),name,type,category,
+    storageType:document.getElementById('fi-storageType').value,
+    dateStored,expDate,
+    qty:parseFloat(document.getElementById('fi-qty').value)||0,
+    qtyUnit:document.getElementById('fi-qtyUnit').value,
+    calories:parseFloat(document.getElementById('fi-calories').value)||0,
+    notes:document.getElementById('fi-notes').value.trim()
+  };
+  if(editingId){const idx=state.items.findIndex(i=>i.id===editingId);state.items[idx]=item;logAction(`Edited item <strong>${name}</strong>`);}
+  else{state.items.push(item);logAction(`Added item <strong>${name}</strong> — ${fmtQty(item)}`);}
+  save();closeModal('modal-item');
+  // Always refresh both current view AND baseline goals (which track inventory changes)
+  renderView_current();
+  renderBaseline();
+  updateSurvival();
+  checkMilestones();
+}
+
+function markInvalid(fieldId,msg){
+  const el=document.getElementById(fieldId);
+  if(el){el.classList.add('invalid');el.focus();}
+  alert(msg);
+  setTimeout(()=>el&&el.classList.remove('invalid'),3000);
+}
+
+function deleteItem(id){
+  const item=state.items.find(i=>i.id===id);
+  showConfirm(`Delete "${item?.name}"? This cannot be undone.`,()=>{
+    state.items=state.items.filter(i=>i.id!==id);
+    logAction(`Deleted item <strong>${item?.name}</strong>`);
+    save();renderView_current();renderBaseline();updateSurvival();
+  });
+}
+
+// ============================================================
+// LOG USAGE
+// ============================================================
+function openUseModal(id){
+  usingId=id;
+  const item=state.items.find(i=>i.id===id);
+  document.getElementById('use-item-name').textContent=item.name;
+  document.getElementById('use-qty').value='0';
+  document.getElementById('use-unit-disp').value=item.qtyUnit||'lbs';
+  document.getElementById('use-cals').value='0';
+  document.getElementById('use-consume-all').checked=false;
+  document.getElementById('use-qty').disabled=false;
+  document.getElementById('use-cals').disabled=false;
+  const type=item.type||'food';
+  document.getElementById('use-cal-row').style.display=type==='food'?'':'none';
+  const qtyEl=document.getElementById('use-qty');
+  qtyEl.oninput=()=>{
+    if(type==='food'&&parseFloat(item.calories)>0&&parseFloat(item.qty)>0){
+      const ratio=(parseFloat(item.calories))/(parseFloat(item.qty));
+      document.getElementById('use-cals').value=Math.round((parseFloat(qtyEl.value)||0)*ratio);
+    }
+  };
+  document.getElementById('modal-use').classList.add('open');
+}
+function toggleConsumeAll(){
+  const all=document.getElementById('use-consume-all').checked;
+  const item=state.items.find(i=>i.id===usingId);
+  if(all){document.getElementById('use-qty').value=item.qty||0;document.getElementById('use-cals').value=item.calories||0;}
+  document.getElementById('use-qty').disabled=all;
+  document.getElementById('use-cals').disabled=all;
+}
+function saveUsage(){
+  const item=state.items.find(i=>i.id===usingId);
+  const all=document.getElementById('use-consume-all').checked;
+  if(all){
+    logAction(`Consumed entire item <strong>${item.name}</strong>`);
+    state.items=state.items.filter(i=>i.id!==usingId);
+  }else{
+    const usedQty=parseFloat(document.getElementById('use-qty').value)||0;
+    const usedCal=parseFloat(document.getElementById('use-cals').value)||0;
+    item.qty=Math.max(0,(parseFloat(item.qty)||0)-usedQty);
+    item.calories=Math.max(0,(parseFloat(item.calories)||0)-usedCal);
+    logAction(`Logged usage of <strong>${item.name}</strong>: ${usedQty} ${item.qtyUnit||'lbs'}${item.type==='food'?` / ${fmtNum(usedCal)} cal`:''}`);
+  }
+  save();closeModal('modal-use');renderView_current();renderBaseline();updateSurvival();
+}
+
+// ============================================================
+// BASELINE
+// ============================================================
+let baselineTab='food';
+function switchBaselineTab(tab,el){
+  baselineTab=tab;
+  document.querySelectorAll('#view-baseline .tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#view-baseline .tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('baseline-tab-'+tab).classList.add('active');
+  renderBaselineTab(tab);
+}
+function renderBaseline(){['food','water','pet','household'].forEach(t=>renderBaselineTab(t));}
+function renderBaselineTab(type){
+  const el=document.getElementById('baseline-tab-'+type);
+  if(!el)return;
+  const goals=(state.baselines||[]).filter(b=>b.type===type);
+  let html=`<div class="btns" style="margin-bottom:14px;">
+    <button class="btn primary" onclick="openBaselineModal('${type}')">+ Set Goal</button>
+  </div>`;
+  if(!goals.length){
+    html+=`<div style="color:var(--text3);font-size:12.5px;padding:14px 0;">No goals set for this type yet. Use <button class="btn sm" onclick="showView('starthere')" style="margin-left:4px;">Start Here</button> to generate goals automatically.</div>`;
+  }else{
+    goals.forEach(g=>{
+      const curr=getBaselineCurrent(g);
+      let bars='';
+      if(type==='food'&&g.targetCals>0){
+        const pct=Math.min(200,curr.cals/(g.targetCals||1)*100);
+        const cls=pct>=100?'green':pct>=60?'amber':'red';
+        bars+=progressBar(`Calories: ${fmtNum(curr.cals)} / ${fmtNum(g.targetCals)}`,pct,cls);
+      }
+      if(type==='pet'&&g.targetWeight>0){
+        const unit=g.weightUnit||'lbs',targetLbs=toLbs(g.targetWeight,unit);
+        const pct=Math.min(200,curr.weightLbs/(targetLbs||1)*100);
+        const cls=pct>=100?'green':pct>=60?'amber':'red';
+        bars+=progressBar(`Weight: ${fmtNum(curr.weightLbs,1)} lbs / ${fmtNum(g.targetWeight)} ${unit}`,pct,cls);
+      }
+      if((type==='household'||type==='water')&&g.targetQty>0){
+        const unit=g.qtyUnit||'count';
+        const pct=Math.min(200,curr.qty/(g.targetQty||1)*100);
+        const cls=pct>=100?'green':pct>=60?'amber':'red';
+        bars+=progressBar(`${type==='water'?'Volume':'Amount'}: ${fmtNum(curr.qty,1)} / ${fmtNum(g.targetQty)} ${unit}`,pct,cls);
+      }
+      const dispCat=g.displayCategory||g.category;
+      html+=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:8px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;">
+          <div>
+            <strong style="font-size:13px;">${dispCat}</strong>
+            ${g.notes?`<div style="font-size:11.5px;color:var(--text3);margin-top:3px;">${g.notes}</div>`:''}
+          </div>
+          <div class="btns">
+            <button class="btn sm green" onclick="openItemModal(null,'${dispCat.replace(/'/g,"\\'")}','${type}')">Log Item</button>
+            <button class="btn sm" onclick="openBaselineModal('${type}','${g.id}')">Edit</button>
+            <button class="btn sm danger" onclick="deleteBaseline('${g.id}')">Del</button>
+          </div>
+        </div>
+        ${bars}
+      </div>`;
+    });
+  }
+  el.innerHTML=html;
+}
+
+function progressBar(label,pct,cls){
+  return`<div style="margin-bottom:6px;">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
+      <span style="color:var(--text3);">${label}</span>
+      <span style="font-family:var(--font-mono);color:var(--${cls});">${Math.round(Math.min(100,pct))}%</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill ${cls}" style="width:${Math.min(100,pct)}%"></div></div>
+  </div>`;
+}
+
+function getBaselineCurrent(goal){
+  const items=state.items.filter(i=>(i.type||'food')===goal.type&&(i.category===goal.displayCategory||i.category===goal.category));
+  const weightLbs=items.reduce((s,i)=>s+toLbs(i.qty,i.qtyUnit),0);
+  const cals=items.reduce((s,i)=>s+(parseFloat(i.calories)||0),0);
+  const goalUnit=(goal.qtyUnit||'count').toLowerCase();
+  let qty=0;
+  items.forEach(i=>{
+    const iu=(i.qtyUnit||'').toLowerCase(),iq=parseFloat(i.qty)||0;
+    if(iu===goalUnit)qty+=iq;
+    else if(goalUnit==='gallons'&&iu==='liters')qty+=iq/3.78541;
+    else if(goalUnit==='liters'&&iu==='gallons')qty+=iq*3.78541;
+    else qty+=iq;
+  });
+  return{weightLbs,cals,qty};
+}
+
+function buildBaselineSummary(){
+  const results=[];
+  (state.baselines||[]).forEach(g=>{
+    const curr=getBaselineCurrent(g);
+    const dispCat=g.displayCategory||g.category;
+    if(g.type==='food'&&g.targetCals>0)results.push({key:g.id+'-c',label:`${dispCat} (cal)`,pct:curr.cals/(g.targetCals||1)*100});
+    if(g.type==='pet'&&g.targetWeight>0){const tl=toLbs(g.targetWeight,g.weightUnit||'lbs');results.push({key:g.id+'-w',label:`${dispCat} (wt)`,pct:curr.weightLbs/(tl||1)*100});}
+    if((g.type==='household'||g.type==='water')&&g.targetQty>0)results.push({key:g.id+'-q',label:`${dispCat} (${g.qtyUnit||'count'})`,pct:curr.qty/(g.targetQty||1)*100});
+  });
+  return results.sort((a,b)=>a.pct-b.pct);
+}
+
+function openBaselineModal(type,id){
+  const g=id?(state.baselines||[]).find(b=>b.id===id):null;
+  document.getElementById('baseline-modal-title').textContent=id?'Edit Baseline Goal':'Set Baseline Goal';
+  document.getElementById('bg-type').value=g?.type||type;
+  onBaselineTypeChange(g?.displayCategory||g?.category);
+  if(g){
+    document.getElementById('bg-category').value=g.category||g.displayCategory;
+    document.getElementById('bg-custom-cat').value=(g.displayCategory&&g.displayCategory!==g.category)?g.displayCategory:'';
+    document.getElementById('bg-calories').value=g.targetCals||0;
+    document.getElementById('bg-weight').value=g.targetWeight||0;
+    document.getElementById('bg-weight-unit').value=g.weightUnit||'lbs';
+    document.getElementById('bg-qty').value=g.targetQty||0;
+    const qtyUnitEl=document.getElementById('bg-qty-unit');
+    if(g.qtyUnit&&[...qtyUnitEl.options].some(o=>o.value===g.qtyUnit))qtyUnitEl.value=g.qtyUnit;
+    document.getElementById('bg-notes').value=g.notes||'';
+  }else{
+    document.getElementById('bg-calories').value=0;
+    document.getElementById('bg-weight').value=0;
+    document.getElementById('bg-qty').value=0;
+    document.getElementById('bg-custom-cat').value='';
+    document.getElementById('bg-notes').value='';
+  }
+  document.getElementById('modal-baseline').dataset.editId=id||'';
+  document.getElementById('modal-baseline').classList.add('open');
+}
+
+function onBaselineTypeChange(presel){
+  const t=document.getElementById('bg-type').value;
+  const cats=getCats(t);
+  const sel=document.getElementById('bg-category');
+  sel.innerHTML=cats.map(c=>`<option ${c===presel?'selected':''}>${c}</option>`).join('');
+  document.getElementById('bg-cal-group').style.display=t==='food'?'':'none';
+  document.getElementById('bg-weight-group').style.display=t==='pet'?'':'none';
+  document.getElementById('bg-weight-unit-group').style.display=t==='pet'?'':'none';
+  document.getElementById('bg-qty-group').style.display=(t==='household'||t==='water')?'':'none';
+  document.getElementById('bg-qty-unit-group').style.display=(t==='household'||t==='water')?'':'none';
+  const qtyUnitSel=document.getElementById('bg-qty-unit');
+  const qtyLabel=document.getElementById('bg-qty-label');
+  if(t==='water'){
+    qtyUnitSel.innerHTML='<option>gallons</option><option>liters</option>';
+    if(qtyLabel)qtyLabel.textContent='Target Volume';
+  }else if(t==='household'){
+    qtyUnitSel.innerHTML='<option>count</option><option>lbs</option><option>oz</option><option>kg</option><option>g</option><option>gallons</option><option>liters</option><option>floz</option>';
+    if(qtyLabel)qtyLabel.textContent='Target Amount';
+  }
+  onBaselineCatChange();
+}
+
+function onBaselineCatChange(){
+  const t=document.getElementById('bg-type').value;
+  const cat=document.getElementById('bg-category').value;
+  document.getElementById('bg-custom-cat-group').style.display=cat===getOtherCatName(t)?'':'none';
+}
+
+function saveBaseline(){
+  if(!state.baselines)state.baselines=[];
+  const type=document.getElementById('bg-type').value;
+  const selCat=document.getElementById('bg-category').value;
+  const otherLabel=getOtherCatName(type);
+  const customCat=document.getElementById('bg-custom-cat').value.trim();
+  const category=selCat;
+  const displayCategory=(selCat===otherLabel&&customCat)?customCat:selCat;
+  const targetCals=parseFloat(document.getElementById('bg-calories').value)||0;
+  const targetWeight=parseFloat(document.getElementById('bg-weight').value)||0;
+  const weightUnit=document.getElementById('bg-weight-unit').value;
+  const targetQty=parseFloat(document.getElementById('bg-qty').value)||0;
+  const qtyUnit=document.getElementById('bg-qty-unit').value;
+  const notes=document.getElementById('bg-notes').value.trim();
+  const editId=document.getElementById('modal-baseline').dataset.editId;
+  if(editId){
+    const b=state.baselines.find(x=>x.id===editId);
+    if(b)Object.assign(b,{type,category,displayCategory,targetCals,targetWeight,weightUnit,targetQty,qtyUnit,notes});
+  }else{
+    state.baselines.push({id:uid(),type,category,displayCategory,targetCals,targetWeight,weightUnit,targetQty,qtyUnit,notes});
+    logAction(`Set baseline goal: ${displayCategory} (${type})`);
+  }
+  save();closeModal('modal-baseline');renderBaseline();
+}
+
+function deleteBaseline(id){
+  showConfirm('Delete this baseline goal?',()=>{
+    state.baselines=state.baselines.filter(b=>b.id!==id);
+    save();renderBaseline();
+  });
+}
+
+// ============================================================
+// LOG
+// ============================================================
+function renderLog(){
+  const el=document.getElementById('log-list');
+  if(!state.log.length){el.innerHTML=`<div class="empty"><div class="empty-ico">≡</div><div class="empty-title">No activity yet.</div></div>`;return;}
+  el.innerHTML=state.log.map(l=>{
+    const d=new Date(l.ts);
+    const ts=d.toLocaleDateString()+'  '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+    return`<div class="log-item"><div class="log-time">${ts}</div><div class="log-desc">${l.desc}</div></div>`;
+  }).join('');
+}
+function clearLog(){showConfirm('Clear the entire activity log?',()=>{state.log=[];save();renderLog();});}
+
+// ============================================================
+// BADGES
+// ============================================================
+function updateBadges(){
+  const expired=state.items.filter(i=>itemStatus(i)==='expired'&&!sessionDismissed.has('item-'+i.id)).length;
+  const expiring=state.items.filter(i=>itemStatus(i)==='expiring'&&!sessionDismissed.has('item-'+i.id)).length;
+  const total=expired+expiring+(state.customAlerts?.length||0);
+  const nb=document.getElementById('nb-alerts');
+  nb.style.display=total?'':'none';nb.textContent=total;
+  const nbe=document.getElementById('nb-expiring');
+  nbe.style.display=expiring?'':'none';nbe.textContent=expiring;
+}
+
+// ============================================================
+// IMPORT / EXPORT
+// ============================================================
+function showExportDialog(){ exportData(); }
+function showImportDialog(e){ importData(e); }
+function exportData(){
+  const d=new Date().toISOString().slice(0,10);
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`stockkept-${d}.json`;a.click();
+  logAction('Exported data to JSON');save();
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const imp=JSON.parse(ev.target.result);
+      if(imp.items){
+        state={...defaultState(),...imp};
+        sessionDismissed=new Set(state.dismissedAlerts||[]);
+        save();logAction(`Imported from ${file.name}`);
+        renderView_current();
+        alert(`Imported successfully: ${state.items.length} items loaded.`);
+      }else alert('Invalid Stockkept file.');
+    }catch(err){alert('Import error: '+err.message);}
+  };
+  r.readAsText(file);e.target.value='';
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function confirmReset(){
+  showConfirm('This will permanently erase ALL data including inventory, goals, logs, and survey answers. This cannot be undone.',()=>{
+    state=defaultState();sessionDismissed=new Set();
+    shAnswers={};shStep=0;shPendingGoals={};
+    save();logAction('All data reset');renderView_current();updateBadges();
+    renderStartHere();
+  },'ERASE ALL DATA');
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+let confirmCallback=null;
+function showConfirm(msg,cb,btnLabel='Confirm'){
+  document.getElementById('conf-title').textContent='Confirm Action';
+  document.getElementById('conf-msg').textContent=msg;
+  document.getElementById('conf-disclaimer').style.display='none';
+  document.getElementById('conf-ok').textContent=btnLabel;
+  document.getElementById('conf-ok').style.background='var(--red)';
+  document.getElementById('conf-ok').style.borderColor='var(--red)';
+  confirmCallback=cb;
+  document.getElementById('modal-confirm').classList.add('open');
+}
+function showConfirmWithDisclaimer(title,msgHtml,disclaimer,cb,btnLabel='Confirm'){
+  document.getElementById('conf-title').textContent=title;
+  document.getElementById('conf-msg').innerHTML=msgHtml;
+  const discEl=document.getElementById('conf-disclaimer');
+  discEl.textContent=disclaimer;discEl.style.display='block';
+  document.getElementById('conf-ok').textContent=btnLabel;
+  document.getElementById('conf-ok').style.background='var(--accent)';
+  document.getElementById('conf-ok').style.borderColor='var(--accent)';
+  confirmCallback=cb;
+  document.getElementById('modal-confirm').classList.add('open');
+}
+document.getElementById('conf-ok').onclick=()=>{closeModal('modal-confirm');if(confirmCallback)confirmCallback();};
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ============================================================
+// RECOMMENDED GOALS (upsert utility, used by Start Here)
+// ============================================================
+function applyRecommendedGoals(g){
+  if(!state.baselines)state.baselines=[];
+  function upsertGoal(type,category,displayCategory,fields){
+    let existing=type==='pet'
+      ?state.baselines.find(b=>b.type===type&&b.displayCategory===displayCategory)
+      :state.baselines.find(b=>b.type===type&&(b.category===category||b.displayCategory===displayCategory));
+    if(existing)Object.assign(existing,fields);
+    else state.baselines.push({id:uid(),type,category,displayCategory,...fields});
+  }
+  if(g.grainCal>0)   upsertGoal('food','Grains & Flour','Grains & Flour',{targetCals:g.grainCal,targetWeight:0,targetQty:0,weightUnit:'lbs',qtyUnit:'count',notes:''});
+  if(g.legumeCal>0)  upsertGoal('food','Legumes','Legumes',{targetCals:g.legumeCal,targetWeight:0,targetQty:0,weightUnit:'lbs',qtyUnit:'count',notes:''});
+  if(g.waterGal>0)   upsertGoal('water','Drinking Water','Total Water',{targetQty:g.waterGal,qtyUnit:'gallons',targetCals:0,targetWeight:0,weightUnit:'lbs',notes:''});
+  if(g.dogFoodLbs>0) upsertGoal('pet','Dry Dog Food','Dry Dog Food',{targetWeight:g.dogFoodLbs,weightUnit:'lbs',targetCals:0,targetQty:0,qtyUnit:'count',notes:''});
+  if(g.catFoodLbs>0) upsertGoal('pet','Dry Cat Food','Dry Cat Food',{targetWeight:g.catFoodLbs,weightUnit:'lbs',targetCals:0,targetQty:0,qtyUnit:'count',notes:''});
+  logAction('Applied recommended baseline goals');
+  save();renderBaseline();
+}
+
+// ============================================================
+// START HERE WIZARD
+// ============================================================
+let shAnswers={},shStep=0;
+// Pending goals the user builds on the results page before applying
+let shPendingGoals={};
+
+const SH_STEPS=[
+  {
+    id:'scenario',q:'What best describes your preparedness goal?',
+    hint:'There\'s no wrong answer — this helps us tailor your starting point.',
+    type:'single',
+    options:[
+      {val:'general',label:'General resilience — a buffer for everyday disruptions like job loss, storms, or illness.'},
+      {val:'disaster',label:'Disaster readiness — I live in an area prone to earthquakes, hurricanes, or wildfires.'},
+      {val:'disruption',label:'Supply chain concerns — protection against shortages or economic instability.'},
+      {val:'homestead',label:'Self-sufficiency / homesteading — building long-term independence.'},
+      {val:'unsure',label:'I\'m not sure yet — just help me get started.'}
+    ]
+  },
+  {
+    id:'duration',q:'How long do you want to be prepared for a disruption?',
+    hint:'Start with what feels manageable. You can always expand your goals later.',
+    type:'single',
+    options:[
+      {val:'2w',label:'2 weeks — a solid foundation for most household emergencies.'},
+      {val:'1m',label:'1 month — covers extended disruptions and natural disasters.'},
+      {val:'3m',label:'3 months — recommended by many preparedness agencies.'},
+      {val:'6m',label:'6 months — meaningful long-term resilience.'},
+      {val:'1y',label:'1 year — serious self-sufficiency.'},
+      {val:'2y+',label:'2+ years — homestead or long-term independence goal.'}
+    ]
+  },
+  {
+    id:'people',q:'How many people are you preparing for?',
+    hint:'Include everyone in your household — adults, children, and elderly family members.',
+    type:'number',
+    fields:[{id:'people-count',label:'Number of people',min:1,default:1}]
+  },
+  {
+    id:'pets',q:'Do you have pets to prepare for?',
+    hint:'Include each pet type and quantity. Leave at 0 if you have none.',
+    type:'number',
+    fields:[
+      {id:'dogs-sm',label:'Small dogs (under 25 lbs)',min:0,default:0},
+      {id:'dogs-md',label:'Medium dogs (25–60 lbs)',min:0,default:0},
+      {id:'dogs-lg',label:'Large dogs (60+ lbs)',min:0,default:0},
+      {id:'cats',label:'Cats',min:0,default:0}
+    ]
+  },
+  {
+    id:'priorities',q:'Which areas do you most want to focus on first?',
+    hint:'Select all that apply.',
+    type:'multi',
+    options:[
+      {val:'allof',label:'A balanced start across all categories'},
+      {val:'food',label:'Food staples (grains, legumes, canned goods)'},
+      {val:'water',label:'Water storage'},
+      {val:'medical',label:'First aid & medications'},
+      {val:'hygiene',label:'Hygiene & household supplies'},
+      {val:'energy',label:'Power, fuel, and batteries'}
+    ]
+  }
+];
+
+const DURATION_YEARS={'2w':2/52,'1m':1/12,'3m':3/12,'6m':0.5,'1y':1,'2y+':2};
+const DURATION_LABELS={'2w':'2 weeks','1m':'1 month','3m':'3 months','6m':'6 months','1y':'1 year','2y+':'2+ years'};
+
+function renderStartHere(){
+  const el=document.getElementById('starthere-content');
+  if(!el)return;
+  if(shStep<SH_STEPS.length)renderShStep(el);
+  else renderShResults(el);
+}
+
+function renderShStep(el){
+  const step=SH_STEPS[shStep];
+  const dots=SH_STEPS.map((s,i)=>`<div class="sh-dot ${i<shStep?'done':i===shStep?'active':''}"></div>`).join('');
+  let body='';
+  if(step.type==='single'||step.type==='multi'){
+    const selected=shAnswers[step.id]||[];
+    body=`<div class="sh-options">${step.options.map(o=>{
+      const isSel=Array.isArray(selected)?selected.includes(o.val):selected===o.val;
+      return`<button class="sh-opt ${isSel?'selected':''}" onclick="shSelect('${step.id}','${o.val}','${step.type}')">${o.label}</button>`;
+    }).join('')}</div>`;
+  }else if(step.type==='number'){
+    body=`<div class="sh-num-row">${step.fields.map(f=>`
+      <div class="sh-num-group">
+        <label>${f.label}</label>
+        <input type="number" id="sh-${f.id}" min="${f.min}" step="1" value="${shAnswers[step.id]?.[f.id]??f.default}">
+      </div>`).join('')}</div>`;
+  }
+  el.innerHTML=`
+    <div class="sh-progress">${dots}</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.07em;">Step ${shStep+1} of ${SH_STEPS.length}</div>
+    <div class="sh-q">${step.q}</div>
+    <div class="sh-hint">${step.hint}</div>
+    ${body}
+    <div class="sh-nav">
+      <button class="btn" onclick="shBack()" ${shStep===0?'disabled style="opacity:0.3"':''}>← Back</button>
+      <button class="btn primary" onclick="shNext()">${shStep===SH_STEPS.length-1?'Build My Starting Goals →':'Next →'}</button>
+    </div>`;
+}
+
+function shSelect(stepId,val,type){
+  if(type==='single'){shAnswers[stepId]=val;}
+  else{
+    if(!shAnswers[stepId])shAnswers[stepId]=[];
+    const arr=shAnswers[stepId];
+    if(val==='none'||val==='allof'){
+      // Exclusive options - selecting clears everything else
+      shAnswers[stepId]=[val];
+    } else {
+      // Remove 'none' or 'allof' if present
+      shAnswers[stepId]=arr.filter(v=>v!=='none'&&v!=='allof');
+      const vi=shAnswers[stepId].indexOf(val);
+      if(vi>-1)shAnswers[stepId].splice(vi,1);else shAnswers[stepId].push(val);
+    }
+  }
+  renderStartHere();
+}
+
+function shNext(){
+  const step=SH_STEPS[shStep];
+  if(step.type==='number'){
+    const saved={};
+    step.fields.forEach(f=>{saved[f.id]=parseInt(document.getElementById('sh-'+f.id)?.value)||f.default;});
+    shAnswers[step.id]=saved;
+  }else if(step.type==='single'&&!shAnswers[step.id]){
+    shAnswers[step.id]=step.options[0].val;
+  }else if(step.type==='multi'&&(!shAnswers[step.id]||!shAnswers[step.id].length)){
+    shAnswers[step.id]=[step.options[0].val];
+  }
+  shStep++;
+  renderStartHere();
+  document.getElementById('main').scrollTop=0;
+  // Sync survival people count
+  if(shAnswers.people?.['people-count']){
+    const peoplEl=document.getElementById('surv-people');
+    if(peoplEl){peoplEl.value=shAnswers.people['people-count'];updateSurvival();}
+  }
+}
+function showStartHereResults(){
+  if(shStep<SH_STEPS.length&&shStep===0){
+    showView('starthere');
+  } else {
+    showView('starthere');
+    document.getElementById('main').scrollTop=0;
+  }
+}
+function shBack(){if(shStep>0){shStep--;renderStartHere();}}
+
+function calcShGoals(){
+  const dur=shAnswers.duration||'3m';
+  const totalYears=DURATION_YEARS[dur]||0.25;
+  const people=shAnswers.people?.['people-count']||1;
+  const dogsSm=shAnswers.pets?.['dogs-sm']||0;
+  const dogsMd=shAnswers.pets?.['dogs-md']||0;
+  const dogsLg=shAnswers.pets?.['dogs-lg']||0;
+  const numCats=shAnswers.pets?.['cats']||0;
+  const totalDogs=dogsSm+dogsMd+dogsLg;
+  return{
+    totalYears,dur,people,dogsSm,dogsMd,dogsLg,numCats,totalDogs,
+    grainCal:Math.round(REC_GRAINS_CAL_PER_PERSON_YEAR*people*totalYears),
+    legumeCal:Math.round(REC_LEGUMES_CAL_PER_PERSON_YEAR*people*totalYears),
+    waterGal:Math.round((people*REC_WATER_GAL_PERSON_YEAR+totalDogs*REC_WATER_GAL_DOG_YEAR+numCats*REC_WATER_GAL_CAT_YEAR)*totalYears),
+    dogFoodLbs:Math.round((dogsSm*REC_DOG_SM_LBS_YEAR+dogsMd*REC_DOG_MD_LBS_YEAR+dogsLg*REC_DOG_LG_LBS_YEAR)*totalYears),
+    catFoodLbs:Math.round(numCats*REC_CAT_LBS_YEAR*totalYears)
+  };
+}
+
+function renderShResults(el){
+  const g=calcShGoals();
+  const durLabel=DURATION_LABELS[g.dur]||'3 months';
+  if(!shPendingGoals.initialized){
+    shPendingGoals={
+      initialized:true,
+      grainCal:g.grainCal,legumeCal:g.legumeCal,
+      waterGal:g.waterGal,dogFoodLbs:g.dogFoodLbs,catFoodLbs:g.catFoodLbs,
+      extras:[]
+    };
+  }
+  const scenario=shAnswers.scenario||'general';
+  const priorities=shAnswers.priorities||[];
+  const suggestions=buildShSuggestions(scenario,priorities,g.people,g.totalYears,shPendingGoals);
+
+  const goalRows=[
+    {key:'grainCal',label:'Grains & Flour (food)',val:`${fmtNum(shPendingGoals.grainCal)} calories`,show:true},
+    {key:'legumeCal',label:'Legumes (food)',val:`${fmtNum(shPendingGoals.legumeCal)} calories`,show:true},
+    {key:'waterGal',label:'Water',val:`${fmtNum(shPendingGoals.waterGal)} gallons`,show:true},
+    {key:'dogFoodLbs',label:'Dry Dog Food',val:`${fmtNum(shPendingGoals.dogFoodLbs)} lbs`,show:shPendingGoals.dogFoodLbs>0},
+    {key:'catFoodLbs',label:'Dry Cat Food',val:`${fmtNum(shPendingGoals.catFoodLbs)} lbs`,show:shPendingGoals.catFoodLbs>0},
+    ...(shPendingGoals.extras||[]).map(e=>({key:'extra-'+e.label,label:e.label,val:e.val,show:true,extra:true}))
+  ].filter(r=>r.show);
+
+  const cardsHtml=goalRows.map(r=>`
+    <div class="sh-result-card" id="shcard-${r.key}">
+      <div><div class="sh-result-title">${r.label}</div><div class="sh-result-val">${r.val}</div></div>
+      ${r.extra?`<button class="btn sm danger" onclick="shRemoveExtra('${r.label}')">Remove</button>`:''}
+    </div>`).join('');
+
+  const sugHtml=suggestions.length?`
+    <div style="margin-bottom:8px;font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;">Suggestions for Your Situation</div>
+    ${suggestions.map(s=>`
+    <div class="sh-suggestion" id="shsug-${s.key}">
+      <div class="sh-suggestion-title">${s.title}</div>
+      <div class="sh-suggestion-body">${s.body}</div>
+      <div class="btns">
+        ${s.addGoal?`<button class="btn sm primary" onclick="shAddSuggestion('${s.key}')">+ Add to Goals</button>`:''}
+        <button class="btn sm" onclick="document.getElementById('shsug-${s.key}').style.display='none'">Dismiss</button>
+      </div>
+    </div>`).join('')}`:'';
+
+  el.innerHTML=`
+    <div class="sh-complete-banner">
+      <h2>You're ready to start building.</h2>
+      <p>Recommended baseline goals for <strong>${g.people} person${g.people>1?'s':''}</strong> over <strong>${durLabel}</strong>. Add any suggestions below, then apply all goals at once.</p>
+    </div>
+    <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;">Your Goal List</div>
+    <div id="sh-goal-list" style="margin-bottom:18px;">${cardsHtml}</div>
+    <div class="btns" style="margin-bottom:28px;">
+      <button class="btn-save" onclick="applyShGoals()">Apply These Goals to My Baseline</button>
+      <button class="btn" onclick="shStep=0;shAnswers={};shPendingGoals={};renderStartHere()">Start Over</button>
+    </div>
+    ${sugHtml}
+    <div style="margin-top:24px;" class="btns">
+      <button class="btn" onclick="showView('inventory')">Go to Inventory</button>
+      <button class="btn" onclick="showView('baseline')">View Baseline Goals</button>
+    </div>`;
+}
+
+// suggestion keys map to category info for adding
+const SH_SUGGESTION_GOALS={
+  'fruitsVeg':{label:'Fruits & Veg (food)',type:'food',category:'Fruits & Veg',field:'cal',perPersonYear:182000},
+  'oilsFats':{label:'Oils & Fats (food)',type:'food',category:'Oils & Fats',field:'cal',perPersonYear:175000},
+  'firstAid':{label:'First Aid (household)',type:'household',category:'First Aid',field:'qty',unit:'count',amount:1},
+  'meds':{label:'Medications (household)',type:'household',category:'Medications',field:'qty',unit:'count',amount:1},
+  'paper':{label:'Paper Products (household)',type:'household',category:'Paper Products',field:'qty',unit:'count',amount:30},
+  'batteries':{label:'Batteries & Power (household)',type:'household',category:'Batteries & Power',field:'qty',unit:'count',amount:24},
+  'fuel':{label:'Fuel (household)',type:'household',category:'Fuel',field:'qty',unit:'gallons',amount:10},
+  'proteins':{label:'Proteins (food)',type:'food',category:'Proteins',field:'cal',perPersonYear:182000}
+};
+
+function buildShSuggestions(scenario,priorities,people,totalYears,pending){
+  const sug=[];
+  const wantFood=priorities.includes('food')||priorities.includes('allof');
+  const wantWater=priorities.includes('water')||priorities.includes('allof');
+  const wantMed=priorities.includes('medical')||priorities.includes('allof');
+  const wantHyg=priorities.includes('hygiene')||priorities.includes('allof');
+  const wantEnergy=priorities.includes('energy')||priorities.includes('allof');
+  const added=new Set((pending.extras||[]).map(e=>e.sourceKey));
+
+  function hasSug(key){return added.has(key);}
+  const g=calcShGoals();
+
+  if(wantFood&&!hasSug('fruitsVeg')){
+    const cal=Math.round(182000*people*totalYears);
+    sug.push({key:'fruitsVeg',title:'Consider a Fruits & Vegetables goal',body:`Freeze-dried or canned fruits and vegetables round out long-term nutrition. A starting target is around ${fmtNum(cal)} calories for your timeframe.`,addGoal:true});
+  }
+  if(wantFood&&!hasSug('oilsFats')){
+    const cal=Math.round(175000*people*totalYears);
+    sug.push({key:'oilsFats',title:'Oils & Fats are often overlooked',body:`Fats provide critical calorie density in long-term storage. Consider around ${fmtNum(cal)} calories from oils, shortening, or similar. Properly sealed oils last 4–5 years.`,addGoal:true});
+  }
+  if((wantFood||scenario==='homestead')&&!hasSug('proteins')){
+    const cal=Math.round(182000*people*totalYears);
+    sug.push({key:'proteins',title:'Diversify your protein sources',body:`Beyond legumes, freeze-dried meats, canned fish, and jerky add important variety. A rough additional protein target: ${fmtNum(cal)} calories.`,addGoal:true});
+  }
+  if(wantMed&&!hasSug('firstAid')){
+    sug.push({key:'firstAid',title:'Set a First Aid supply goal',body:'A well-stocked first aid kit is one of the highest-value preparedness investments. Track your supplies under Household.',addGoal:true});
+  }
+  if(wantMed&&!hasSug('meds')){
+    sug.push({key:'meds',title:'Consider a medication buffer',body:'If anyone in your household takes regular medications, ask your doctor about maintaining a 30–90 day supply.',addGoal:true});
+  }
+  if(wantHyg&&!hasSug('paper')){
+    sug.push({key:'paper',title:'Paper products add up quickly',body:'Toilet paper, paper towels, and similar supplies are consistently the first cleared from shelves during disruptions.',addGoal:true});
+  }
+  if((wantEnergy||scenario==='disaster')&&!hasSug('batteries')){
+    sug.push({key:'batteries',title:'Power and battery reserves',body:'Batteries, fuel, and backup power become critical when utilities fail. Even a modest supply of AA/AAA batteries makes a significant difference.',addGoal:true});
+  }
+  if(wantWater){
+    sug.push({key:'waterPurify',title:'Don\'t forget water purification',body:'Stored water is only part of the equation. Consider adding water filtration tablets or a gravity filter to your household supplies.',addGoal:false});
+  }
+  if(scenario==='disaster'){
+    sug.push({key:'gobag',title:'Build a 72-hour go-bag',body:'For earthquake or hurricane preparedness, a grab-and-go bag with 3 days of essentials is often the most immediately useful investment.',addGoal:false});
+  }
+  return sug;
+}
+
+function shAddSuggestion(key){
+  const def=SH_SUGGESTION_GOALS[key];
+  if(!def)return;
+  if(!shPendingGoals.extras)shPendingGoals.extras=[];
+  const g=calcShGoals();
+  let val='';
+  if(def.field==='cal'){
+    const cal=Math.round((def.perPersonYear||182000)*g.people*g.totalYears);
+    val=`${fmtNum(cal)} calories`;
+    shPendingGoals.extras.push({sourceKey:key,label:def.label,val,type:def.type,category:def.category,targetCals:cal,targetWeight:0,targetQty:0,weightUnit:'lbs',qtyUnit:'count'});
+  }else{
+    val=`${def.amount} ${def.unit}`;
+    shPendingGoals.extras.push({sourceKey:key,label:def.label,val,type:def.type,category:def.category,targetQty:def.amount,qtyUnit:def.unit,targetCals:0,targetWeight:0,weightUnit:'lbs'});
+  }
+  document.getElementById('shsug-'+key)?.style&&(document.getElementById('shsug-'+key).style.display='none');
+  renderShResults(document.getElementById('starthere-content'));
+}
+
+function shRemoveExtra(label){
+  shPendingGoals.extras=(shPendingGoals.extras||[]).filter(e=>e.label!==label);
+  renderShResults(document.getElementById('starthere-content'));
+}
+
+function applyShGoals(){
+  const g=shPendingGoals;
+  const lines=[
+    `<strong>Food:</strong> Grains & Flour ${fmtNum(g.grainCal)} cal, Legumes ${fmtNum(g.legumeCal)} cal`,
+    `<strong>Water:</strong> ${fmtNum(g.waterGal)} gallons`,
+    g.dogFoodLbs>0?`<strong>Pet (dogs):</strong> ${fmtNum(g.dogFoodLbs)} lbs dry dog food`:null,
+    g.catFoodLbs>0?`<strong>Pet (cats):</strong> ${fmtNum(g.catFoodLbs)} lbs dry cat food`:null,
+    ...(g.extras||[]).map(e=>`<strong>${e.label}:</strong> ${e.val}`)
+  ].filter(Boolean).join('<br>');
+  const msgHtml=`<div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:10px;">${lines}</div>`;
+  const disclaimer='These are recommendations based on general preparedness guidelines. They are intended as a starting point only. Actual needs depend on dietary requirements, health conditions, activity levels, and individual circumstances. Please review and adjust each goal to suit your household.';
+  showConfirmWithDisclaimer('Apply these goals to your Baseline?',msgHtml,disclaimer,()=>{
+    applyRecommendedGoals(g);
+    (g.extras||[]).forEach(e=>{
+      if(!state.baselines)state.baselines=[];
+      const exists=state.baselines.find(b=>b.category===e.category&&b.type===e.type);
+      if(!exists)state.baselines.push({id:uid(),type:e.type,category:e.category,displayCategory:e.label.split(' (')[0],targetCals:e.targetCals||0,targetWeight:e.targetWeight||0,weightUnit:e.weightUnit||'lbs',targetQty:e.targetQty||0,qtyUnit:e.qtyUnit||'count',notes:''});
+    });
+    save();renderBaseline();
+    logAction('Applied Start Here goals to baseline');
+    // Force survey step past end so onboarding alert disappears
+    shStep=SH_STEPS.length;
+    // Sync people count to survival widget
+    if(shAnswers.people?.['people-count']){
+      const pe=document.getElementById('surv-people');
+      if(pe){pe.value=shAnswers.people['people-count'];updateSurvival();}
+    }
+    updateStartHereButton();
+    showView('baseline');
+  },'Apply Goals');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+load();
+showView('dashboard');
+renderStartHere();
+// Show welcome modal on first load (download version)
+if(!localStorage.getItem('stockkept_welcomed')){
+  localStorage.setItem('stockkept_welcomed','1');
+  setTimeout(()=>document.getElementById('modal-welcome').classList.add('open'),600);
+}
+</script>
+</body>
+</html>
