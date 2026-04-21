@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stockkept — Household Supply Tracker</title>
 <style>
-/* Self-hosted fonts — no external requests */
 @font-face{font-display:swap;font-family:'Playfair Display';font-style:normal;font-weight:400;src:url('/fonts/playfair-display-v40-latin-regular.woff2') format('woff2');}
 @font-face{font-display:swap;font-family:'Playfair Display';font-style:normal;font-weight:600;src:url('/fonts/playfair-display-v40-latin-600.woff2') format('woff2');}
 @font-face{font-display:swap;font-family:'DM Mono';font-style:normal;font-weight:400;src:url('/fonts/dm-mono-v16-latin-regular.woff2') format('woff2');}
@@ -14,7 +13,6 @@
 @font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:400;src:url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2');}
 @font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:500;src:url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2');}
 @font-face{font-display:swap;font-family:'DM Sans';font-style:normal;font-weight:600;src:url('/fonts/dm-sans-v17-latin-600.woff2') format('woff2');}
-
 :root{
   --bg:#0f1117;--bg2:#161820;--bg3:#1d1f2b;--bg4:#252836;
   --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
@@ -259,7 +257,7 @@ select option{background:var(--bg3);}
 <!-- HEADER -->
 <header id="header">
   <div class="logo">
-    <div>Stockkept<span>Household Supply Tracker · v8</span></div>
+    <div>Stockkept<span>Household Supply Tracker · v11</span></div>
   </div>
   <button class="hdr-btn primary" id="hdr-starthere-btn" onclick="showView('starthere')" style="display:none;font-size:13.5px;padding:8px 18px;font-weight:600;margin-right:auto;">★ Start Here</button>
   <span id="hdr-spacer" style="margin-right:auto;display:none;"></span>
@@ -282,12 +280,15 @@ select option{background:var(--bg3);}
   <div class="nav-item" onclick="showView('starthere')" data-view="starthere"><span class="ico">★</span>Start Here</div>
   <div class="nav-item" onclick="showView('instructions')" data-view="instructions"><span class="ico">?</span>How to Use</div>
   <a class="nav-ext" href="https://docs.google.com/forms/d/e/1FAIpQLSfe8J7YdUjEGwbZ3iRKHMngnlsKh07pHypeZx0fjy8Nhn6b4w/viewform?usp=publish-editor" target="_blank"><span class="ico">✉</span>Feedback / Bug Report</a>
-  <a class="nav-ext" onclick="showView('legal')" data-view="legal" style="cursor:pointer;"><span class="ico">§</span>Legal Notices</a>
+  <a class="nav-ext" onclick="showView('legal')" style="cursor:pointer;"><span class="ico">§</span>Legal Notices</a>
   <div style="margin-top:auto;padding:14px 10px;border-top:1px solid var(--border);">
     <button class="hdr-btn" style="width:100%;display:flex;justify-content:center;font-size:12px;margin-bottom:7px;background:rgba(200,169,110,0.15);border-color:rgba(200,169,110,0.3);color:var(--accent);" onclick="alert('Download Stockkept storefront coming soon!')">&#x2B07;&#xFE0E; Download Stockkept</button>
     <button class="hdr-btn" style="width:100%;display:flex;justify-content:center;font-size:12px;margin-bottom:7px;" onclick="window.open('https://ko-fi.com/stockkept','_blank')">🫘 Buy Me a Can of Beans</button>
     <button class="hdr-btn" style="width:100%;display:flex;justify-content:center;font-size:12px;margin-bottom:7px;" onclick="showExportDialog()">Export JSON</button>
     <label class="hdr-btn" style="width:100%;display:flex;justify-content:center;cursor:pointer;font-size:12px;">Import JSON<input type="file" accept=".json" style="display:none" onchange="showImportDialog(event)"></label>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);text-align:center;line-height:1.6;">
+      Stockkept v11 · Last updated: June 2025<br>© 2025 North American Health Sciences LLC
+    </div>
   </div>
 </nav>
 
@@ -316,7 +317,7 @@ select option{background:var(--bg3);}
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
             <label style="font-size:11px;color:var(--text2);">Cal/person/day</label>
-            <select id="surv-cals" onchange="updateSurvival()" style="width:170px;font-size:12px;padding:5px 7px;">
+            <select id="surv-cals" onchange="updateSurvival()" style="width:175px;font-size:12px;padding:5px 7px;">
               <option value="1600">1,600</option>
               <option value="1700">1,700</option>
               <option value="1800">1,800</option>
@@ -477,22 +478,33 @@ select option{background:var(--bg3);}
   <div class="view-sub">New to building a preparedness supply? Answer a few questions and we'll set up your starting goals.</div>
   <div id="starthere-content"></div>
 </div>
+
 <!-- LEGAL NOTICES -->
 <div class="view" id="view-legal">
   <div class="view-title">Legal Notices</div>
   <div class="view-sub">Terms, disclaimers, and policies governing your use of Stockkept.</div>
   <div class="card">
-    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px;">Stockkept is owned and operated by North American Health Sciences LLC (NAHSCO). Last updated: 2025.</div>
+    <p style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:20px;">Stockkept is owned and operated by North American Health Sciences LLC. Last updated: 2025.</p>
+
+    <div class="instructions-section">
+      <h3>Data Collection — What You Should Know</h3>
+      <p>Here is every point where data could theoretically leave your device when using Stockkept:</p>
+      <p><strong>GitHub Pages hosting</strong> — Stockkept is hosted on GitHub Pages (GitHub, Inc.). GitHub logs visitor IP addresses for security on every page load. This is infrastructure-level collection by GitHub, not by North American Health Sciences LLC, and is governed by the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" target="_blank" style="color:var(--blue);">GitHub Privacy Statement</a>.</p>
+      <p><strong>Ko-fi / Buy Me a Can of Beans button</strong> — Clicking this button navigates to ko-fi.com. Ko-fi and Stripe will see your IP address, browser information, and any account information you provide. This only occurs on a deliberate click.</p>
+      <p><strong>Feedback / Bug Report link</strong> — This link navigates to Google Forms. Google will see your IP address when you visit the form. This only occurs on a deliberate click.</p>
+      <p><strong>localStorage (your inventory data)</strong> — All data you enter into Stockkept stays entirely within your browser. It is never transmitted anywhere. No server, no API, nothing leaving your device.</p>
+      <div class="legal-notice">The short answer: the only passive data collection in the web version is GitHub's IP logging on page load. Everything else — Ko-fi, Google Forms — only activates when you deliberately click an external link. The download version has zero passive data collection of any kind.</div>
+    </div>
 
     <div class="instructions-section">
       <h3>Accuracy and Currency of Information</h3>
-      <p>Stockkept.com is provided for general informational and personal planning purposes only. North American Health Sciences LLC reserves the right to modify, update, or discontinue any aspect of this application at any time and without prior notice. While we strive to keep information current and accurate, North American Health Sciences LLC makes no representations or warranties regarding the completeness, accuracy, or timeliness of any content within the application. NAHSCO assumes no liability for any damages — direct, indirect, incidental, or consequential — arising from errors, omissions, technical issues, or discrepancies within the application or its data.</p>
+      <p>Stockkept.com is provided for general informational and personal planning purposes only. North American Health Sciences LLC reserves the right to modify, update, or discontinue any aspect of this application at any time and without prior notice. While we strive to keep information current and accurate, North American Health Sciences LLC makes no representations or warranties regarding the completeness, accuracy, or timeliness of any content within the application. North American Health Sciences LLC assumes no liability for any damages — direct, indirect, incidental, or consequential — arising from errors, omissions, technical issues, or discrepancies within the application or its data.</p>
     </div>
 
     <div class="instructions-section">
       <h3>"As Is" Disclaimer</h3>
-      <p>Stockkept, including all data, software, calculations, and documentation, is provided <strong>"as is"</strong> without warranty of any kind, whether express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement. North American Health Sciences LLC (NAHSCO), its affiliates, agents, and licensors expressly disclaim all such warranties to the fullest extent permitted by applicable law.</p>
-      <p>Survival estimates, calorie calculations, baseline goals, and related figures generated by Stockkept are approximations intended for general planning purposes only. They do not constitute professional nutritional, medical, emergency management, or survival advice. Users should consult qualified professionals for guidance specific to their circumstances.</p>
+      <p>Stockkept, including all data, software, calculations, and documentation, is provided <strong>"as is"</strong> without warranty of any kind, whether express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement. North American Health Sciences LLC, its affiliates, agents, and licensors expressly disclaim all such warranties to the fullest extent permitted by applicable law.</p>
+      <p><strong>Stockkept does not provide nutritional, medical, or survival advice.</strong> Survival estimates, calorie calculations, baseline goals, and related figures generated by Stockkept are approximations intended for general planning purposes only. They do not constitute professional nutritional, medical, emergency management, or survival advice. Users should consult qualified professionals for guidance specific to their circumstances.</p>
     </div>
 
     <div class="instructions-section">
@@ -503,13 +515,13 @@ select option{background:var(--bg3);}
 
     <div class="instructions-section">
       <h3>Third-Party Links</h3>
-      <p>Stockkept may contain links to third-party websites or services not maintained or controlled by NAHSCO. These links are provided for convenience only. North American Health Sciences LLC does not endorse, guarantee, or assume responsibility for the content, accuracy, or practices of any third-party site. The inclusion of any link does not imply affiliation with or endorsement by NAHSCO. Users access third-party sites at their own risk and should review the applicable terms and privacy policies of those sites.</p>
+      <p>Stockkept may contain links to third-party websites or services not maintained or controlled by North American Health Sciences LLC. These links are provided for convenience only. North American Health Sciences LLC does not endorse, guarantee, or assume responsibility for the content, accuracy, or practices of any third-party site. The inclusion of any link does not imply affiliation with or endorsement by North American Health Sciences LLC. Users access third-party sites at their own risk and should review the applicable terms and privacy policies of those sites.</p>
     </div>
 
     <div class="instructions-section">
       <h3>User Communications and Feedback</h3>
-      <p>By submitting feedback, messages, or communications through any feedback mechanism associated with Stockkept, you grant NAHSCO a non-exclusive, royalty-free, perpetual license to use, reproduce, and display such communications for purposes including product improvement, promotional materials, and testimonials, with reasonable attribution where practicable. You represent that any feedback you submit is your own and does not infringe the rights of any third party.</p>
-      <p>Communications and testimonials published in connection with Stockkept represent the views of individual users and do not reflect the opinions or positions of NAHSCO. NAHSCO reserves the right to decline to publish or to remove any submission at its discretion.</p>
+      <p>By submitting feedback, messages, or communications through any feedback mechanism associated with Stockkept, you grant North American Health Sciences LLC a non-exclusive, royalty-free, perpetual license to use, reproduce, and display such communications for purposes including product improvement, promotional materials, and testimonials, with reasonable attribution where practicable. You represent that any feedback you submit is your own and does not infringe the rights of any third party.</p>
+      <p>Communications and testimonials published in connection with Stockkept represent the views of individual users and do not reflect the opinions or positions of North American Health Sciences LLC. North American Health Sciences LLC reserves the right to decline to publish or to remove any submission at its discretion.</p>
     </div>
 
     <div class="instructions-section">
@@ -521,17 +533,17 @@ select option{background:var(--bg3);}
 
     <div class="instructions-section">
       <h3>Intellectual Property</h3>
-      <p>The Stockkept application, including its name, design, code, graphics, interface, and all related content, is the proprietary intellectual property of NAHSCO and is protected by applicable copyright, trademark, and other intellectual property laws. The Stockkept name and any associated marks are trademarks of NAHSCO. Unauthorized reproduction, distribution, modification, or commercial use of any portion of Stockkept without express written permission from NAHSCO is prohibited.</p>
+      <p>The Stockkept application, including its name, design, code, graphics, interface, and all related content, is the proprietary intellectual property of North American Health Sciences LLC and is protected by applicable copyright, trademark, and other intellectual property laws. The Stockkept name and any associated marks are trademarks of North American Health Sciences LLC. Unauthorized reproduction, distribution, modification, or commercial use of any portion of Stockkept without express written permission from North American Health Sciences LLC is prohibited.</p>
       <p>You may use Stockkept for personal, non-commercial household planning purposes. If you have purchased a licensed download, that license is granted to you personally and is non-transferable.</p>
     </div>
 
     <div class="instructions-section">
       <h3>Governing Law</h3>
-      <p>These notices and your use of Stockkept are governed by the laws of the applicable jurisdiction in which NAHSCO is established, without regard to conflict of law principles. Any disputes arising from your use of Stockkept shall be resolved in the appropriate courts of that jurisdiction.</p>
+      <p>These notices and your use of Stockkept are governed by the laws of the applicable jurisdiction in which North American Health Sciences LLC is established, without regard to conflict of law principles. Any disputes arising from your use of Stockkept shall be resolved in the appropriate courts of that jurisdiction.</p>
     </div>
 
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
-      <p style="font-size:12px;color:var(--text3);line-height:1.7;">© 2025 North American Health Sciences LLC. All rights reserved. Stockkept is a product of NAHSCO. For questions regarding these notices, please use the Feedback / Bug Report link in the sidebar.</p>
+    <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);">
+      <p style="font-size:11.5px;color:var(--text3);line-height:1.7;">© 2025 North American Health Sciences LLC. All rights reserved. Stockkept is a product of North American Health Sciences LLC. For questions regarding these notices, please use the Feedback / Bug Report link in the sidebar.</p>
     </div>
   </div>
 </div>
@@ -916,6 +928,8 @@ function showView(id){
   if(id==='starthere')renderStartHere();
   updateBadges();
 }
+
+function currentView(){const v=document.querySelector('.view.active');return v?v.id.replace('view-',''):'dashboard';}
 function renderView_current(){
   const id=currentView();
   if(id==='dashboard')renderDashboard();
@@ -1293,6 +1307,8 @@ function saveItem(){
   if(!dateStored){markInvalid('fi-dateStored','Date stored is required.');return;}
   const expDate=document.getElementById('fi-expDate').value;
   if((type==='food'||type==='water')&&!expDate){markInvalid('fi-expDate','Expiration date is required for food and water.');return;}
+  const qty=parseFloat(document.getElementById('fi-qty').value)||0;
+  if(qty<=0){markInvalid('fi-qty','Quantity must be greater than 0.');return;}
   if(type==='food'){
     const cal=parseFloat(document.getElementById('fi-calories').value)||0;
     if(cal<=0){markInvalid('fi-calories','Calories are required for food items.');return;}
@@ -1308,12 +1324,7 @@ function saveItem(){
   };
   if(editingId){const idx=state.items.findIndex(i=>i.id===editingId);state.items[idx]=item;logAction(`Edited item <strong>${name}</strong>`);}
   else{state.items.push(item);logAction(`Added item <strong>${name}</strong> — ${fmtQty(item)}`);}
-  save();closeModal('modal-item');
-  // Always refresh both current view AND baseline goals (which track inventory changes)
-  renderView_current();
-  renderBaseline();
-  updateSurvival();
-  checkMilestones();
+  save();closeModal('modal-item');renderView_current();checkMilestones();
 }
 
 function markInvalid(fieldId,msg){
@@ -1328,7 +1339,7 @@ function deleteItem(id){
   showConfirm(`Delete "${item?.name}"? This cannot be undone.`,()=>{
     state.items=state.items.filter(i=>i.id!==id);
     logAction(`Deleted item <strong>${item?.name}</strong>`);
-    save();renderView_current();renderBaseline();updateSurvival();
+    save();renderView_current();
   });
 }
 
@@ -1367,16 +1378,20 @@ function saveUsage(){
   const item=state.items.find(i=>i.id===usingId);
   const all=document.getElementById('use-consume-all').checked;
   if(all){
-    logAction(`Consumed entire item <strong>${item.name}</strong>`);
-    state.items=state.items.filter(i=>i.id!==usingId);
-  }else{
-    const usedQty=parseFloat(document.getElementById('use-qty').value)||0;
-    const usedCal=parseFloat(document.getElementById('use-cals').value)||0;
-    item.qty=Math.max(0,(parseFloat(item.qty)||0)-usedQty);
-    item.calories=Math.max(0,(parseFloat(item.calories)||0)-usedCal);
-    logAction(`Logged usage of <strong>${item.name}</strong>: ${usedQty} ${item.qtyUnit||'lbs'}${item.type==='food'?` / ${fmtNum(usedCal)} cal`:''}`);
+    closeModal('modal-use');
+    showConfirm(`Mark "${item.name}" as fully consumed? This will permanently remove it from your inventory. The item cannot be recovered after deletion.`,()=>{
+      logAction(`Consumed entire item <strong>${item.name}</strong>`);
+      state.items=state.items.filter(i=>i.id!==usingId);
+      save();renderView_current();
+    },'Yes, Remove Item');
+    return;
   }
-  save();closeModal('modal-use');renderView_current();renderBaseline();updateSurvival();
+  const usedQty=parseFloat(document.getElementById('use-qty').value)||0;
+  const usedCal=parseFloat(document.getElementById('use-cals').value)||0;
+  item.qty=Math.max(0,(parseFloat(item.qty)||0)-usedQty);
+  item.calories=Math.max(0,(parseFloat(item.calories)||0)-usedCal);
+  logAction(`Logged usage of <strong>${item.name}</strong>: ${usedQty} ${item.qtyUnit||'lbs'}${item.type==='food'?` / ${fmtNum(usedCal)} cal`:''}`);
+  save();closeModal('modal-use');renderView_current();
 }
 
 // ============================================================
@@ -2017,7 +2032,7 @@ function applyShGoals(){
     ...(g.extras||[]).map(e=>`<strong>${e.label}:</strong> ${e.val}`)
   ].filter(Boolean).join('<br>');
   const msgHtml=`<div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:10px;">${lines}</div>`;
-  const disclaimer='These are recommendations based on general preparedness guidelines. They are intended as a starting point only. Actual needs depend on dietary requirements, health conditions, activity levels, and individual circumstances. Please review and adjust each goal to suit your household.';
+  const disclaimer='These are recommendations based on general preparedness guidelines and are intended as a starting point only. Actual needs depend on dietary requirements, health conditions, activity levels, and individual circumstances. Please review and adjust each goal to suit your household. Stockkept does not provide nutritional, medical, or survival advice.';
   showConfirmWithDisclaimer('Apply these goals to your Baseline?',msgHtml,disclaimer,()=>{
     applyRecommendedGoals(g);
     (g.extras||[]).forEach(e=>{
