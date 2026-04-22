@@ -257,7 +257,7 @@ select option{background:var(--bg3);}
 <!-- HEADER -->
 <header id="header">
   <div class="logo">
-    <div>Stockkept<span>Household Supply Tracker · v11</span></div>
+    <div>Stockkept<span>Household Supply Tracker · v12</span></div>
   </div>
   <button class="hdr-btn primary" id="hdr-starthere-btn" onclick="showView('starthere')" style="display:none;font-size:13.5px;padding:8px 18px;font-weight:600;margin-right:auto;">★ Start Here</button>
   <span id="hdr-spacer" style="margin-right:auto;display:none;"></span>
@@ -287,7 +287,7 @@ select option{background:var(--bg3);}
     <button class="hdr-btn" style="width:100%;display:flex;justify-content:center;font-size:12px;margin-bottom:7px;" onclick="showExportDialog()">Export JSON</button>
     <label class="hdr-btn" style="width:100%;display:flex;justify-content:center;cursor:pointer;font-size:12px;">Import JSON<input type="file" accept=".json" style="display:none" onchange="showImportDialog(event)"></label>
     <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);text-align:center;line-height:1.6;">
-      Stockkept v11 · Last updated: June 2025<br>© 2025 North American Health Sciences LLC
+      Stockkept v12 · Last updated: June 2025<br>© 2025 North American Health Sciences LLC
     </div>
   </div>
 </nav>
@@ -1406,7 +1406,8 @@ function switchBaselineTab(tab,el){
   document.getElementById('baseline-tab-'+tab).classList.add('active');
   renderBaselineTab(tab);
 }
-function renderBaseline(){['food','water','pet','household'].forEach(t=>renderBaselineTab(t));}
+function renderBaseline(){
+  const _bldays=calcSurvivalDays();const _blel=document.getElementById('bl-surv-days');if(_blel)_blel.textContent=_bldays>0?_bldays.toFixed(1):'0.0';['food','water','pet','household'].forEach(t=>renderBaselineTab(t));}
 function renderBaselineTab(type){
   const el=document.getElementById('baseline-tab-'+type);
   if(!el)return;
